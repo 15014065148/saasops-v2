@@ -1,0 +1,88 @@
+-------------------------------------------- 创建存储过程
+drop PROCEDURE if exists wk;
+create PROCEDURE wk()
+BEGIN
+DECLARE i int;
+set i=1;
+while i<5000 DO
+update opr_act_activity set mbLogoUrl=(REPLACE((SELECT * FROM (SELECT mbLogoUrl FROM opr_act_activity where id=i) a),'img-ybh.oduosa.com','download.vebapp.net')) WHERE id=i;
+update opr_act_activity set pcLogoUrl=(REPLACE((SELECT * FROM (SELECT pcLogoUrl FROM opr_act_activity where id=i) a),'img-ybh.oduosa.com','download.vebapp.net')) WHERE id=i;
+update opr_act_activity set pcRemoteFileName=(REPLACE((SELECT * FROM (SELECT pcRemoteFileName FROM opr_act_activity where id=i) a),'img-ybh.oduosa.com','download.vebapp.net')) WHERE id=i;
+update opr_act_activity set mbRemoteFileName=(REPLACE((SELECT * FROM (SELECT mbRemoteFileName FROM opr_act_activity where id=i) a),'img-ybh.oduosa.com','download.vebapp.net')) WHERE id=i;
+update opr_act_activity set pcGroupName=(REPLACE((SELECT * FROM (SELECT pcGroupName FROM opr_act_activity where id=i) a),'img-ybh.oduosa.com','download.vebapp.net')) WHERE id=i;
+update opr_adv set picMbPath=(REPLACE((SELECT * FROM (SELECT picMbPath FROM opr_adv where id=i) a),'img-ybh.oduosa.com','download.vebapp.net')) WHERE id=i;
+update opr_adv set picPcPath=(REPLACE((SELECT * FROM (SELECT picPcPath FROM opr_adv where id=i) a),'img-ybh.oduosa.com','download.vebapp.net')) WHERE id=i;
+update t_bs_bank set bankLog=(REPLACE((SELECT * FROM (SELECT bankLog FROM t_bs_bank where id=i) a),'img-ybh.oduosa.com','download.vebapp.net')) WHERE id=i;
+update t_bs_bank set backBankImg=(REPLACE((SELECT * FROM (SELECT backBankImg FROM t_bs_bank where id=i) a),'img-ybh.oduosa.com','download.vebapp.net')) WHERE id=i;
+update t_game_logo set mbPicUrl=(REPLACE((SELECT * FROM (SELECT mbPicUrl FROM t_game_logo where id=i) a),'img-ybh.oduosa.com','download.vebapp.net')) WHERE id=i;
+update t_game_logo set picUrl=(REPLACE((SELECT * FROM (SELECT picUrl FROM t_game_logo where id=i) a),,'img-ybh.oduosa.com','download.vebapp.net')) WHERE id=i;
+update t_gm_game set logo=(REPLACE((SELECT * FROM (SELECT logo FROM t_gm_game where id=i) a),'img-ybh.oduosa.com','download.vebapp.net')) WHERE id=i;
+update t_gm_game set logo2=(REPLACE((SELECT * FROM (SELECT logo2 FROM t_gm_game where id=i) a),'img-ybh.oduosa.com','download.vebapp.net')) WHERE id=i;
+update t_op_pay set mBankLog=(REPLACE((SELECT * FROM (SELECT mBankLog FROM t_op_pay where id=i) a),'img-ybh.oduosa.com','download.vebapp.net')) WHERE id=i;
+update t_opr_adv set picMbPath=(REPLACE((SELECT * FROM (SELECT picMbPath FROM t_opr_adv where id=i) a),'img-ybh.oduosa.com','download.vebapp.net')) WHERE id=i;
+update t_opr_adv set picPcPath=(REPLACE((SELECT * FROM (SELECT picPcPath FROM t_opr_adv where id=i) a),'img-ybh.oduosa.com','download.vebapp.net')) WHERE id=i;
+update t_opt_adv_banner set picPcPath=(REPLACE((SELECT * FROM (SELECT picPcPath FROM t_opt_adv_banner where id=i) a),'img-ybh.oduosa.com','download.vebapp.net')) WHERE id=i;
+update t_opt_adv_banner set picMbPath=(REPLACE((SELECT * FROM (SELECT picMbPath FROM t_opt_adv_banner where id=i) a),'img-ybh.oduosa.com','download.vebapp.net')) WHERE id=i;
+set i=i+1;
+end while;
+update set_basic_set_sys_setting set sysValue= (REPLACE((SELECT * FROM (SELECT sysValue FROM set_basic_set_sys_setting where sysKey='logoPath') a),'img-ybh.oduosa.com','download.vebapp.net')) where sysKey='logoPath';
+update set_basic_set_sys_setting set sysValue= (REPLACE((SELECT * FROM (SELECT sysValue FROM set_basic_set_sys_setting where sysKey='titlePath') a),'img-ybh.oduosa.com','download.vebapp.net')) where sysKey='titlePath';
+end
+--------------------------------------------执行存储过程
+call wk();
+--------------------------------------------删除存储过程
+drop PROCEDURE if exists wk;
+
+
+
+
+
+
+
+
+UPDATE opr_act_activity SET mbLogoUrl=REPLACE(mbLogoUrl,'img-ybh.oduosa.com','download.vebapp.net');
+UPDATE opr_act_activity SET pcLogoUrl=REPLACE(pcLogoUrl,'img-ybh.oduosa.com','download.vebapp.net');
+UPDATE opr_act_activity SET pcRemoteFileName=REPLACE(pcRemoteFileName,'img-ybh.oduosa.com','download.vebapp.net');
+UPDATE opr_act_activity SET mbRemoteFileName=REPLACE(mbRemoteFileName,'img-ybh.oduosa.com','download.vebapp.net');
+UPDATE opr_act_activity SET pcGroupName=REPLACE(pcGroupName,'img-ybh.oduosa.com','download.vebapp.net');
+UPDATE opr_adv SET picMbPath=REPLACE(picMbPath,'img-ybh.oduosa.com','download.vebapp.net');
+UPDATE opr_adv SET picPcPath=REPLACE(picPcPath,'img-ybh.oduosa.com','download.vebapp.net');
+--
+UPDATE t_bs_bank SET bankLog=REPLACE(bankLog,'img-ybh.oduosa.com','download.vebapp.net');
+UPDATE t_bs_bank SET backBankImg=REPLACE(backBankImg,'img-ybh.oduosa.com','download.vebapp.net');
+UPDATE t_game_logo SET mbPicUrl=REPLACE(mbPicUrl,'img-ybh.oduosa.com','download.vebapp.net');
+UPDATE t_game_logo SET picUrl=REPLACE(picUrl,'img-ybh.oduosa.com','download.vebapp.net');
+UPDATE t_game_logo SET appPicUrl=REPLACE(appPicUrl,'img-ybh.oduosa.com','download.vebapp.net');
+UPDATE t_game_logo SET logoPc=REPLACE(logoPc,'img-ybh.oduosa.com','download.vebapp.net');
+UPDATE t_game_logo SET logoApp=REPLACE(logoApp,'img-ybh.oduosa.com','download.vebapp.net');
+UPDATE t_game_logo SET logoMb=REPLACE(logoMb,'img-ybh.oduosa.com','download.vebapp.net');
+UPDATE t_gm_game SET logo=REPLACE(logo,'img-ybh.oduosa.com','download.vebapp.net');
+UPDATE t_gm_game SET logo2=REPLACE(logo2,'img-ybh.oduosa.com','download.vebapp.net');
+UPDATE t_op_pay SET mBankLog=REPLACE(mBankLog,'img-ybh.oduosa.com','download.vebapp.net');
+UPDATE t_opr_adv SET picMbPath=REPLACE(picMbPath,'img-ybh.oduosa.com','download.vebapp.net');
+UPDATE t_opr_adv SET picPcPath=REPLACE(picPcPath,'img-ybh.oduosa.com','download.vebapp.net');
+UPDATE t_opt_adv_banner SET picPcPath=REPLACE(picPcPath,'img-ybh.oduosa.com','download.vebapp.net');
+UPDATE t_opt_adv_banner SET picMbPath=REPLACE(picMbPath,'img-ybh.oduosa.com','download.vebapp.net');
+
+UPDATE opr_act_activity SET mbLogoUrl=REPLACE(mbLogoUrl,'http://','https://');
+UPDATE opr_act_activity SET pcLogoUrl=REPLACE(pcLogoUrl,'http://','https://');
+UPDATE opr_act_activity SET pcRemoteFileName=REPLACE(pcRemoteFileName,'http://','https://');
+UPDATE opr_act_activity SET mbRemoteFileName=REPLACE(mbRemoteFileName,'http://','https://');
+UPDATE opr_act_activity SET pcGroupName=REPLACE(pcGroupName,'http://','https://');
+UPDATE opr_adv SET picMbPath=REPLACE(picMbPath,'http://','https://');
+UPDATE opr_adv SET picPcPath=REPLACE(picPcPath,'http://','https://');
+UPDATE t_bs_bank SET bankLog=REPLACE(bankLog,'http://','https://');
+UPDATE t_bs_bank SET backBankImg=REPLACE(backBankImg,'http://','https://');
+UPDATE t_game_logo SET mbPicUrl=REPLACE(mbPicUrl,'http://','https://');
+UPDATE t_game_logo SET picUrl=REPLACE(picUrl,'http://','https://');
+UPDATE t_game_logo SET appPicUrl=REPLACE(appPicUrl,'http://','https://');
+UPDATE t_game_logo SET logoPc=REPLACE(logoPc,'http://','https://');
+UPDATE t_game_logo SET logoApp=REPLACE(logoApp,'http://','https://');
+UPDATE t_game_logo SET logoMb=REPLACE(logoMb,'http://','https://');
+UPDATE t_gm_game SET logo=REPLACE(logo,'http://','https://');
+UPDATE t_gm_game SET logo2=REPLACE(logo2,'http://','https://');
+UPDATE t_op_pay SET mBankLog=REPLACE(mBankLog,'http://','https://');
+UPDATE t_opr_adv SET picMbPath=REPLACE(picMbPath,'http://','https://');
+UPDATE t_opr_adv SET picPcPath=REPLACE(picPcPath,'http://','https://');
+UPDATE t_opt_adv_banner SET picPcPath=REPLACE(picPcPath,'http://','https://');
+UPDATE t_opt_adv_banner SET picMbPath=REPLACE(picMbPath,'http://','https://');

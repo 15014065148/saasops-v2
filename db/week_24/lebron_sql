@@ -1,0 +1,217 @@
+delete from sys_menu where menu_id in (107,108,128,129,130,131,220,221,224);
+
+INSERT INTO `sys_menu`(`menu_id`, `parent_id`, `name`, `url`, `perms`, `type`, `icon`, `order_num`, `columnName`, `operate`) VALUES (706, 106, '会员详情', NULL, 'member:mbraccount:list,member:mbraccount:info', 3, NULL, 0, NULL, NULL);
+INSERT INTO `sys_menu`(`menu_id`, `parent_id`, `name`, `url`, `perms`, `type`, `icon`, `order_num`, `columnName`, `operate`) VALUES (707, 106, '新增会员', NULL, 'member:mbraccount:save', 3, NULL, 0, NULL, NULL);
+INSERT INTO `sys_menu`(`menu_id`, `parent_id`, `name`, `url`, `perms`, `type`, `icon`, `order_num`, `columnName`, `operate`) VALUES (708, 106, '导出', NULL, NULL, 3, NULL, 0, NULL, NULL);
+
+INSERT INTO `sys_menu`(`menu_id`, `parent_id`, `name`, `url`, `perms`, `type`, `icon`, `order_num`, `columnName`, `operate`) VALUES (722, 706, '会员资料', NULL, NULL, 3, NULL, 0, NULL, NULL);
+INSERT INTO `sys_menu`(`menu_id`, `parent_id`, `name`, `url`, `perms`, `type`, `icon`, `order_num`, `columnName`, `operate`) VALUES (723, 706, '其他资料', NULL, NULL, 3, NULL, 0, NULL, NULL);
+INSERT INTO `sys_menu`(`menu_id`, `parent_id`, `name`, `url`, `perms`, `type`, `icon`, `order_num`, `columnName`, `operate`) VALUES (724, 706, '风控审核', NULL, NULL, 3, NULL, 0, NULL, NULL);
+INSERT INTO `sys_menu`(`menu_id`, `parent_id`, `name`, `url`, `perms`, `type`, `icon`, `order_num`, `columnName`, `operate`) VALUES (725, 706, '最新备注', NULL, NULL, 3, NULL, 0, NULL, NULL);
+INSERT INTO `sys_menu`(`menu_id`, `parent_id`, `name`, `url`, `perms`, `type`, `icon`, `order_num`, `columnName`, `operate`) VALUES (726, 706, '游戏管理', NULL, NULL, 3, NULL, 0, NULL, NULL);
+INSERT INTO `sys_menu`(`menu_id`, `parent_id`, `name`, `url`, `perms`, `type`, `icon`, `order_num`, `columnName`, `operate`) VALUES (727, 706, '资产信息', NULL, NULL, 3, NULL, 0, NULL, NULL);
+INSERT INTO `sys_menu`(`menu_id`, `parent_id`, `name`, `url`, `perms`, `type`, `icon`, `order_num`, `columnName`, `operate`) VALUES (728, 706, '会员日志', NULL, NULL, 3, NULL, 0, NULL, NULL);
+INSERT INTO `sys_menu`(`menu_id`, `parent_id`, `name`, `url`, `perms`, `type`, `icon`, `order_num`, `columnName`, `operate`) VALUES (729, 706, '重置登陆密码', NULL, 'member:mbraccount:pwdUpdate', 3, NULL, 0, NULL, NULL);
+INSERT INTO `sys_menu`(`menu_id`, `parent_id`, `name`, `url`, `perms`, `type`, `icon`, `order_num`, `columnName`, `operate`) VALUES (730, 706, '重置提款密码', NULL, 'member:mbraccount:secPwdUpdate', 3, NULL, 0, NULL, NULL);
+INSERT INTO `sys_menu`(`menu_id`, `parent_id`, `name`, `url`, `perms`, `type`, `icon`, `order_num`, `columnName`, `operate`) VALUES (731, 722, '用户名', NULL, NULL, 3, NULL, 0, 'loginName', NULL);
+INSERT INTO `sys_menu`(`menu_id`, `parent_id`, `name`, `url`, `perms`, `type`, `icon`, `order_num`, `columnName`, `operate`) VALUES (732, 722, '姓名', '', '', 3, '', 0, 'realName', NULL);
+INSERT INTO `sys_menu`(`menu_id`, `parent_id`, `name`, `url`, `perms`, `type`, `icon`, `order_num`, `columnName`, `operate`) VALUES (733, 722, '电话', NULL, NULL, 3, NULL, 0, 'mobile', NULL);
+INSERT INTO `sys_menu`(`menu_id`, `parent_id`, `name`, `url`, `perms`, `type`, `icon`, `order_num`, `columnName`, `operate`) VALUES (734, 722, '银行卡', NULL, 'member:mbrbankcard:list,member:mbrbankcard:info', 3, NULL, 0, NULL, NULL);
+INSERT INTO `sys_menu`(`menu_id`, `parent_id`, `name`, `url`, `perms`, `type`, `icon`, `order_num`, `columnName`, `operate`) VALUES (735, 722, '邮箱', NULL, NULL, 3, NULL, 0, 'email', NULL);
+INSERT INTO `sys_menu`(`menu_id`, `parent_id`, `name`, `url`, `perms`, `type`, `icon`, `order_num`, `columnName`, `operate`) VALUES (736, 722, '微信', NULL, NULL, 3, NULL, 0, 'weChat', NULL);
+INSERT INTO `sys_menu`(`menu_id`, `parent_id`, `name`, `url`, `perms`, `type`, `icon`, `order_num`, `columnName`, `operate`) VALUES (737, 722, 'QQ', NULL, NULL, 3, NULL, 0, 'qq', NULL);
+INSERT INTO `sys_menu`(`menu_id`, `parent_id`, `name`, `url`, `perms`, `type`, `icon`, `order_num`, `columnName`, `operate`) VALUES (738, 722, '注册时间', NULL, NULL, 3, NULL, 0, 'registerTime', NULL);
+INSERT INTO `sys_menu`(`menu_id`, `parent_id`, `name`, `url`, `perms`, `type`, `icon`, `order_num`, `columnName`, `operate`) VALUES (739, 722, '注册IP', NULL, NULL, 3, NULL, 0, 'registerIp', NULL);
+INSERT INTO `sys_menu`(`menu_id`, `parent_id`, `name`, `url`, `perms`, `type`, `icon`, `order_num`, `columnName`, `operate`) VALUES (740, 722, '注册网址', NULL, NULL, 3, NULL, 0, 'registerUrl', NULL);
+INSERT INTO `sys_menu`(`menu_id`, `parent_id`, `name`, `url`, `perms`, `type`, `icon`, `order_num`, `columnName`, `operate`) VALUES (741, 722, '最后登录时间', NULL, NULL, 3, NULL, 0, 'loginTime', NULL);
+INSERT INTO `sys_menu`(`menu_id`, `parent_id`, `name`, `url`, `perms`, `type`, `icon`, `order_num`, `columnName`, `operate`) VALUES (742, 722, '最后登录IP', '', '', 3, '', 0, 'loginIp', NULL);
+INSERT INTO `sys_menu`(`menu_id`, `parent_id`, `name`, `url`, `perms`, `type`, `icon`, `order_num`, `columnName`, `operate`) VALUES (743, 723, '主账号余额', NULL, NULL, 3, NULL, 0, 'balance', NULL);
+INSERT INTO `sys_menu`(`menu_id`, `parent_id`, `name`, `url`, `perms`, `type`, `icon`, `order_num`, `columnName`, `operate`) VALUES (744, 723, '状态', NULL, NULL, 3, NULL, 0, 'available', NULL);
+INSERT INTO `sys_menu`(`menu_id`, `parent_id`, `name`, `url`, `perms`, `type`, `icon`, `order_num`, `columnName`, `operate`) VALUES (745, 723, '会员组', NULL, NULL, 3, NULL, 0, 'groupId', NULL);
+INSERT INTO `sys_menu`(`menu_id`, `parent_id`, `name`, `url`, `perms`, `type`, `icon`, `order_num`, `columnName`, `operate`) VALUES (746, 723, '总代', NULL, NULL, 3, NULL, 0, 'tagencyId', NULL);
+INSERT INTO `sys_menu`(`menu_id`, `parent_id`, `name`, `url`, `perms`, `type`, `icon`, `order_num`, `columnName`, `operate`) VALUES (747, 723, '是否在线', NULL, NULL, 3, NULL, 0, 'isOnline', NULL);
+INSERT INTO `sys_menu`(`menu_id`, `parent_id`, `name`, `url`, `perms`, `type`, `icon`, `order_num`, `columnName`, `operate`) VALUES (748, 723, '代理', NULL, NULL, 3, NULL, 0, 'cagencyId', NULL);
+INSERT INTO `sys_menu`(`menu_id`, `parent_id`, `name`, `url`, `perms`, `type`, `icon`, `order_num`, `columnName`, `operate`) VALUES (749, 724, '同注册IP', NULL, NULL, 3, NULL, 0, 'registerIp', NULL);
+INSERT INTO `sys_menu`(`menu_id`, `parent_id`, `name`, `url`, `perms`, `type`, `icon`, `order_num`, `columnName`, `operate`) VALUES (750, 724, '同邮箱', NULL, NULL, 3, NULL, 0, 'loginIp', NULL);
+INSERT INTO `sys_menu`(`menu_id`, `parent_id`, `name`, `url`, `perms`, `type`, `icon`, `order_num`, `columnName`, `operate`) VALUES (751, 724, '同登录IP', NULL, NULL, 3, NULL, 0, 'agent', NULL);
+INSERT INTO `sys_menu`(`menu_id`, `parent_id`, `name`, `url`, `perms`, `type`, `icon`, `order_num`, `columnName`, `operate`) VALUES (752, 724, '同QQ', NULL, NULL, 3, NULL, 0, 'email', NULL);
+INSERT INTO `sys_menu`(`menu_id`, `parent_id`, `name`, `url`, `perms`, `type`, `icon`, `order_num`, `columnName`, `operate`) VALUES (753, 724, '同一代理', NULL, NULL, 3, NULL, 0, 'qq', NULL);
+INSERT INTO `sys_menu`(`menu_id`, `parent_id`, `name`, `url`, `perms`, `type`, `icon`, `order_num`, `columnName`, `operate`) VALUES (762, 727, '线上入款次数', NULL, NULL, 3, NULL, 0, 'onlinedepositNum', NULL);
+INSERT INTO `sys_menu`(`menu_id`, `parent_id`, `name`, `url`, `perms`, `type`, `icon`, `order_num`, `columnName`, `operate`) VALUES (763, 727, '线上入款金额', NULL, NULL, 3, NULL, 0, 'onlinedepositAmounts', NULL);
+INSERT INTO `sys_menu`(`menu_id`, `parent_id`, `name`, `url`, `perms`, `type`, `icon`, `order_num`, `columnName`, `operate`) VALUES (764, 727, '公司入款次数', NULL, NULL, 3, NULL, 0, 'offlinedepositNum', NULL);
+INSERT INTO `sys_menu`(`menu_id`, `parent_id`, `name`, `url`, `perms`, `type`, `icon`, `order_num`, `columnName`, `operate`) VALUES (765, 727, '公司入款金额', NULL, NULL, 3, NULL, 0, 'offlinedepositAmounts', NULL);
+INSERT INTO `sys_menu`(`menu_id`, `parent_id`, `name`, `url`, `perms`, `type`, `icon`, `order_num`, `columnName`, `operate`) VALUES (766, 727, '提款次数', NULL, NULL, 3, NULL, 0, 'withDrawNum', NULL);
+INSERT INTO `sys_menu`(`menu_id`, `parent_id`, `name`, `url`, `perms`, `type`, `icon`, `order_num`, `columnName`, `operate`) VALUES (767, 727, '提款总额', NULL, NULL, 3, NULL, 0, 'withdrawdrawingAmounts', NULL);
+INSERT INTO `sys_menu`(`menu_id`, `parent_id`, `name`, `url`, `perms`, `type`, `icon`, `order_num`, `columnName`, `operate`) VALUES (768, 727, '红利次数', NULL, NULL, 3, NULL, 0, 'bonusNum', NULL);
+INSERT INTO `sys_menu`(`menu_id`, `parent_id`, `name`, `url`, `perms`, `type`, `icon`, `order_num`, `columnName`, `operate`) VALUES (769, 727, '红利金额', NULL, NULL, 3, NULL, 0, 'bonusAmounts', NULL);
+INSERT INTO `sys_menu`(`menu_id`, `parent_id`, `name`, `url`, `perms`, `type`, `icon`, `order_num`, `columnName`, `operate`) VALUES (770, 727, '人工调整次数', NULL, NULL, 3, NULL, 0, 'adjustNum', NULL);
+INSERT INTO `sys_menu`(`menu_id`, `parent_id`, `name`, `url`, `perms`, `type`, `icon`, `order_num`, `columnName`, `operate`) VALUES (771, 727, '人工调整金额', NULL, NULL, 3, NULL, 0, 'amounts', NULL);
+INSERT INTO `sys_menu`(`menu_id`, `parent_id`, `name`, `url`, `perms`, `type`, `icon`, `order_num`, `columnName`, `operate`) VALUES (772, 727, '总投注额', NULL, NULL, 3, NULL, 0, 'bet', NULL);
+INSERT INTO `sys_menu`(`menu_id`, `parent_id`, `name`, `url`, `perms`, `type`, `icon`, `order_num`, `columnName`, `operate`) VALUES (773, 727, '有效投注额', NULL, NULL, 3, NULL, 0, 'validBet', NULL);
+INSERT INTO `sys_menu`(`menu_id`, `parent_id`, `name`, `url`, `perms`, `type`, `icon`, `order_num`, `columnName`, `operate`) VALUES (774, 727, '总派彩', NULL, NULL, 3, NULL, 0, 'payout', NULL);
+INSERT INTO `sys_menu`(`menu_id`, `parent_id`, `name`, `url`, `perms`, `type`, `icon`, `order_num`, `columnName`, `operate`) VALUES (775, 727, '即时稽核', NULL, NULL, 3, NULL, 0, '', NULL);
+INSERT INTO `sys_menu`(`menu_id`, `parent_id`, `name`, `url`, `perms`, `type`, `icon`, `order_num`, `columnName`, `operate`) VALUES (788, 728, '资金流水', NULL, NULL, 3, NULL, 0, NULL, NULL);
+INSERT INTO `sys_menu`(`menu_id`, `parent_id`, `name`, `url`, `perms`, `type`, `icon`, `order_num`, `columnName`, `operate`) VALUES (789, 728, '转账记录', '', '', 3, '', 0, NULL, NULL);
+INSERT INTO `sys_menu`(`menu_id`, `parent_id`, `name`, `url`, `perms`, `type`, `icon`, `order_num`, `columnName`, `operate`) VALUES (790, 728, '存款记录', NULL, NULL, 3, NULL, 0, NULL, NULL);
+INSERT INTO `sys_menu`(`menu_id`, `parent_id`, `name`, `url`, `perms`, `type`, `icon`, `order_num`, `columnName`, `operate`) VALUES (791, 728, '提款记录', NULL, NULL, 3, NULL, 0, NULL, NULL);
+INSERT INTO `sys_menu`(`menu_id`, `parent_id`, `name`, `url`, `perms`, `type`, `icon`, `order_num`, `columnName`, `operate`) VALUES (792, 728, '红利记录', NULL, NULL, 3, NULL, 0, NULL, NULL);
+INSERT INTO `sys_menu`(`menu_id`, `parent_id`, `name`, `url`, `perms`, `type`, `icon`, `order_num`, `columnName`, `operate`) VALUES (793, 728, '资料变更', NULL, NULL, 3, NULL, 0, NULL, NULL);
+INSERT INTO `sys_menu`(`menu_id`, `parent_id`, `name`, `url`, `perms`, `type`, `icon`, `order_num`, `columnName`, `operate`) VALUES (794, 728, '登录日志', NULL, NULL, 3, NULL, 0, NULL, NULL);
+INSERT INTO `sys_menu`(`menu_id`, `parent_id`, `name`, `url`, `perms`, `type`, `icon`, `order_num`, `columnName`, `operate`) VALUES (795, 732, '姓名-修改', NULL, NULL, 3, NULL, 0, NULL, 2);
+INSERT INTO `sys_menu`(`menu_id`, `parent_id`, `name`, `url`, `perms`, `type`, `icon`, `order_num`, `columnName`, `operate`) VALUES (796, 733, '电话-修改', NULL, NULL, 3, NULL, 0, NULL, 2);
+INSERT INTO `sys_menu`(`menu_id`, `parent_id`, `name`, `url`, `perms`, `type`, `icon`, `order_num`, `columnName`, `operate`) VALUES (797, 734, '银行卡-修改', NULL, 'member:mbrbankcard:update', 3, NULL, 0, NULL, 2);
+INSERT INTO `sys_menu`(`menu_id`, `parent_id`, `name`, `url`, `perms`, `type`, `icon`, `order_num`, `columnName`, `operate`) VALUES (798, 734, '银行卡-删除', NULL, 'member:mbrbankcard:delete', 3, NULL, 0, NULL, 3);
+INSERT INTO `sys_menu`(`menu_id`, `parent_id`, `name`, `url`, `perms`, `type`, `icon`, `order_num`, `columnName`, `operate`) VALUES (799, 735, '邮箱-修改', NULL, NULL, 3, NULL, 0, NULL, 2);
+INSERT INTO `sys_menu`(`menu_id`, `parent_id`, `name`, `url`, `perms`, `type`, `icon`, `order_num`, `columnName`, `operate`) VALUES (800, 736, '微信-修改', NULL, NULL, 3, NULL, 0, NULL, 2);
+INSERT INTO `sys_menu`(`menu_id`, `parent_id`, `name`, `url`, `perms`, `type`, `icon`, `order_num`, `columnName`, `operate`) VALUES (801, 737, 'QQ-修改', NULL, NULL, 3, NULL, 0, NULL, 2);
+INSERT INTO `sys_menu`(`menu_id`, `parent_id`, `name`, `url`, `perms`, `type`, `icon`, `order_num`, `columnName`, `operate`) VALUES (802, 722, '会员资料', NULL, NULL, 3, NULL, 0, NULL, 2);
+INSERT INTO `sys_menu`(`menu_id`, `parent_id`, `name`, `url`, `perms`, `type`, `icon`, `order_num`, `columnName`, `operate`) VALUES (803, 723, '其他资料', NULL, NULL, 3, NULL, 0, NULL, 2);
+INSERT INTO `sys_menu`(`menu_id`, `parent_id`, `name`, `url`, `perms`, `type`, `icon`, `order_num`, `columnName`, `operate`) VALUES (804, 744, '状态-修改', NULL, NULL, 3, NULL, 0, NULL, 2);
+INSERT INTO `sys_menu`(`menu_id`, `parent_id`, `name`, `url`, `perms`, `type`, `icon`, `order_num`, `columnName`, `operate`) VALUES (805, 745, '会员组-修改', NULL, 'member:mbraccount:groupIdUpdate', 3, NULL, 0, NULL, 2);
+INSERT INTO `sys_menu`(`menu_id`, `parent_id`, `name`, `url`, `perms`, `type`, `icon`, `order_num`, `columnName`, `operate`) VALUES (806, 746, '总代-修改', NULL, NULL, 3, NULL, 0, NULL, 2);
+INSERT INTO `sys_menu`(`menu_id`, `parent_id`, `name`, `url`, `perms`, `type`, `icon`, `order_num`, `columnName`, `operate`) VALUES (807, 748, '代理-修改', NULL, NULL, 3, NULL, 0, NULL, 2);
+INSERT INTO `sys_menu`(`menu_id`, `parent_id`, `name`, `url`, `perms`, `type`, `icon`, `order_num`, `columnName`, `operate`) VALUES (808, 706, '发送站内信', NULL, NULL, 3, NULL, 0, NULL, NULL);
+INSERT INTO `sys_menu`(`menu_id`, `parent_id`, `name`, `url`, `perms`, `type`, `icon`, `order_num`, `columnName`, `operate`) VALUES (835, 706, '人工增加调整', NULL, NULL, 3, NULL, 0, NULL, NULL);
+INSERT INTO `sys_menu`(`menu_id`, `parent_id`, `name`, `url`, `perms`, `type`, `icon`, `order_num`, `columnName`, `operate`) VALUES (836, 706, '人工减少调整', NULL, NULL, 3, NULL, 0, NULL, NULL);
+INSERT INTO `sys_menu`(`menu_id`, `parent_id`, `name`, `url`, `perms`, `type`, `icon`, `order_num`, `columnName`, `operate`) VALUES (840, 734, '银行卡-新增', NULL, 'member:mbrbankcard:save', 3, NULL, NULL, NULL, 1);
+
+INSERT INTO `sys_menu`(`menu_id`, `parent_id`, `name`, `url`, `perms`, `type`, `icon`, `order_num`, `columnName`, `operate`) VALUES (811, 106, '会员名', NULL, NULL, 4, NULL, 0, 'loginName', NULL);
+INSERT INTO `sys_menu`(`menu_id`, `parent_id`, `name`, `url`, `perms`, `type`, `icon`, `order_num`, `columnName`, `operate`) VALUES (812, 106, '真实姓名', '', '', 4, '', 0, 'realName', NULL);
+INSERT INTO `sys_menu`(`menu_id`, `parent_id`, `name`, `url`, `perms`, `type`, `icon`, `order_num`, `columnName`, `operate`) VALUES (813, 106, '代理', NULL, NULL, 4, NULL, 0, 'agyAccount', NULL);
+INSERT INTO `sys_menu`(`menu_id`, `parent_id`, `name`, `url`, `perms`, `type`, `icon`, `order_num`, `columnName`, `operate`) VALUES (814, 106, '会员组', NULL, NULL, 4, NULL, 0, 'groupName', NULL);
+INSERT INTO `sys_menu`(`menu_id`, `parent_id`, `name`, `url`, `perms`, `type`, `icon`, `order_num`, `columnName`, `operate`) VALUES (815, 106, '总余额', NULL, NULL, 4, NULL, 0, 'totalBalance', NULL);
+INSERT INTO `sys_menu`(`menu_id`, `parent_id`, `name`, `url`, `perms`, `type`, `icon`, `order_num`, `columnName`, `operate`) VALUES (816, 106, '注册时间', NULL, NULL, 4, NULL, 0, 'registerTime', NULL);
+INSERT INTO `sys_menu`(`menu_id`, `parent_id`, `name`, `url`, `perms`, `type`, `icon`, `order_num`, `columnName`, `operate`) VALUES (817, 106, '首存时间', NULL, NULL, 4, NULL, 0, 'depositTime', NULL);
+INSERT INTO `sys_menu`(`menu_id`, `parent_id`, `name`, `url`, `perms`, `type`, `icon`, `order_num`, `columnName`, `operate`) VALUES (818, 106, '最后登录时间', NULL, NULL, 4, NULL, 0, 'loginTime', NULL);
+INSERT INTO `sys_menu`(`menu_id`, `parent_id`, `name`, `url`, `perms`, `type`, `icon`, `order_num`, `columnName`, `operate`) VALUES (819, 106, '状态', NULL, NULL, 4, NULL, 0, 'available', NULL);
+INSERT INTO `sys_menu`(`menu_id`, `parent_id`, `name`, `url`, `perms`, `type`, `icon`, `order_num`, `columnName`, `operate`) VALUES (820, 106, '会员名', NULL, NULL, 5, NULL, 0, 'loginName', NULL);
+INSERT INTO `sys_menu`(`menu_id`, `parent_id`, `name`, `url`, `perms`, `type`, `icon`, `order_num`, `columnName`, `operate`) VALUES (821, 106, '真实姓名', NULL, NULL, 5, NULL, 0, 'realName', NULL);
+INSERT INTO `sys_menu`(`menu_id`, `parent_id`, `name`, `url`, `perms`, `type`, `icon`, `order_num`, `columnName`, `operate`) VALUES (822, 106, '手机号码', NULL, NULL, 5, NULL, 0, 'mobile', NULL);
+INSERT INTO `sys_menu`(`menu_id`, `parent_id`, `name`, `url`, `perms`, `type`, `icon`, `order_num`, `columnName`, `operate`) VALUES (823, 106, '邮箱', NULL, NULL, 5, NULL, 0, 'email', NULL);
+INSERT INTO `sys_menu`(`menu_id`, `parent_id`, `name`, `url`, `perms`, `type`, `icon`, `order_num`, `columnName`, `operate`) VALUES (824, 106, '注册网址', NULL, NULL, 5, NULL, 0, 'registerUrl', NULL);
+INSERT INTO `sys_menu`(`menu_id`, `parent_id`, `name`, `url`, `perms`, `type`, `icon`, `order_num`, `columnName`, `operate`) VALUES (825, 106, '注册来源', NULL, NULL, 5, NULL, 0, 'registerSource', NULL);
+INSERT INTO `sys_menu`(`menu_id`, `parent_id`, `name`, `url`, `perms`, `type`, `icon`, `order_num`, `columnName`, `operate`) VALUES (826, 106, '登录来源', NULL, NULL, 5, NULL, 0, 'loginSource', NULL);
+INSERT INTO `sys_menu`(`menu_id`, `parent_id`, `name`, `url`, `perms`, `type`, `icon`, `order_num`, `columnName`, `operate`) VALUES (827, 106, '总代', NULL, NULL, 5, NULL, 0, 'tagencyId', NULL);
+INSERT INTO `sys_menu`(`menu_id`, `parent_id`, `name`, `url`, `perms`, `type`, `icon`, `order_num`, `columnName`, `operate`) VALUES (828, 106, '代理', NULL, NULL, 5, NULL, 0, 'agyAccount', NULL);
+INSERT INTO `sys_menu`(`menu_id`, `parent_id`, `name`, `url`, `perms`, `type`, `icon`, `order_num`, `columnName`, `operate`) VALUES (829, 106, '会员组', NULL, NULL, 5, NULL, 0, 'groupName', NULL);
+INSERT INTO `sys_menu`(`menu_id`, `parent_id`, `name`, `url`, `perms`, `type`, `icon`, `order_num`, `columnName`, `operate`) VALUES (830, 106, '状态', '', '', 5, '', 0, 'available', NULL);
+INSERT INTO `sys_menu`(`menu_id`, `parent_id`, `name`, `url`, `perms`, `type`, `icon`, `order_num`, `columnName`, `operate`) VALUES (831, 106, '在线会员', NULL, NULL, 5, NULL, 0, 'isOnline', NULL);
+INSERT INTO `sys_menu`(`menu_id`, `parent_id`, `name`, `url`, `perms`, `type`, `icon`, `order_num`, `columnName`, `operate`) VALUES (832, 106, 'QQ', NULL, NULL, 5, NULL, 0, 'qq', NULL);
+INSERT INTO `sys_menu`(`menu_id`, `parent_id`, `name`, `url`, `perms`, `type`, `icon`, `order_num`, `columnName`, `operate`) VALUES (834, 106, '最后登录时间', NULL, NULL, 5, NULL, 0, 'loginTime', NULL);
+
+
+
+
+
+
+
+
+
+
+
+----
+INSERT INTO `sys_role_menu`(`role_id`, `menu_id`, `isTotalChecked`) VALUES (1, 706, 1);
+INSERT INTO `sys_role_menu`(`role_id`, `menu_id`, `isTotalChecked`) VALUES (1, 707, 1);
+INSERT INTO `sys_role_menu`(`role_id`, `menu_id`, `isTotalChecked`) VALUES (1, 708, 1);
+INSERT INTO `sys_role_menu`(`role_id`, `menu_id`, `isTotalChecked`) VALUES (1, 722, 1);
+INSERT INTO `sys_role_menu`(`role_id`, `menu_id`, `isTotalChecked`) VALUES (1, 723, 1);
+INSERT INTO `sys_role_menu`(`role_id`, `menu_id`, `isTotalChecked`) VALUES (1, 724, 1);
+INSERT INTO `sys_role_menu`(`role_id`, `menu_id`, `isTotalChecked`) VALUES (1, 725, 1);
+INSERT INTO `sys_role_menu`(`role_id`, `menu_id`, `isTotalChecked`) VALUES (1, 726, 1);
+INSERT INTO `sys_role_menu`(`role_id`, `menu_id`, `isTotalChecked`) VALUES (1, 727, 1);
+INSERT INTO `sys_role_menu`(`role_id`, `menu_id`, `isTotalChecked`) VALUES (1, 728, 1);
+INSERT INTO `sys_role_menu`(`role_id`, `menu_id`, `isTotalChecked`) VALUES (1, 729, 1);
+INSERT INTO `sys_role_menu`(`role_id`, `menu_id`, `isTotalChecked`) VALUES (1, 730, 1);
+INSERT INTO `sys_role_menu`(`role_id`, `menu_id`, `isTotalChecked`) VALUES (1, 731, 1);
+INSERT INTO `sys_role_menu`(`role_id`, `menu_id`, `isTotalChecked`) VALUES (1, 732, 1);
+INSERT INTO `sys_role_menu`(`role_id`, `menu_id`, `isTotalChecked`) VALUES (1, 733, 1);
+INSERT INTO `sys_role_menu`(`role_id`, `menu_id`, `isTotalChecked`) VALUES (1, 734, 1);
+INSERT INTO `sys_role_menu`(`role_id`, `menu_id`, `isTotalChecked`) VALUES (1, 735, 1);
+INSERT INTO `sys_role_menu`(`role_id`, `menu_id`, `isTotalChecked`) VALUES (1, 736, 1);
+INSERT INTO `sys_role_menu`(`role_id`, `menu_id`, `isTotalChecked`) VALUES (1, 737, 1);
+INSERT INTO `sys_role_menu`(`role_id`, `menu_id`, `isTotalChecked`) VALUES (1, 738, 1);
+INSERT INTO `sys_role_menu`(`role_id`, `menu_id`, `isTotalChecked`) VALUES (1, 739, 1);
+INSERT INTO `sys_role_menu`(`role_id`, `menu_id`, `isTotalChecked`) VALUES (1, 740, 1);
+INSERT INTO `sys_role_menu`(`role_id`, `menu_id`, `isTotalChecked`) VALUES (1, 741, 1);
+INSERT INTO `sys_role_menu`(`role_id`, `menu_id`, `isTotalChecked`) VALUES (1, 742, 1);
+INSERT INTO `sys_role_menu`(`role_id`, `menu_id`, `isTotalChecked`) VALUES (1, 743, 1);
+INSERT INTO `sys_role_menu`(`role_id`, `menu_id`, `isTotalChecked`) VALUES (1, 744, 1);
+INSERT INTO `sys_role_menu`(`role_id`, `menu_id`, `isTotalChecked`) VALUES (1, 745, 1);
+INSERT INTO `sys_role_menu`(`role_id`, `menu_id`, `isTotalChecked`) VALUES (1, 746, 1);
+INSERT INTO `sys_role_menu`(`role_id`, `menu_id`, `isTotalChecked`) VALUES (1, 747, 1);
+INSERT INTO `sys_role_menu`(`role_id`, `menu_id`, `isTotalChecked`) VALUES (1, 748, 1);
+INSERT INTO `sys_role_menu`(`role_id`, `menu_id`, `isTotalChecked`) VALUES (1, 749, 1);
+INSERT INTO `sys_role_menu`(`role_id`, `menu_id`, `isTotalChecked`) VALUES (1, 750, 1);
+INSERT INTO `sys_role_menu`(`role_id`, `menu_id`, `isTotalChecked`) VALUES (1, 751, 1);
+INSERT INTO `sys_role_menu`(`role_id`, `menu_id`, `isTotalChecked`) VALUES (1, 752, 1);
+INSERT INTO `sys_role_menu`(`role_id`, `menu_id`, `isTotalChecked`) VALUES (1, 753, 1);
+INSERT INTO `sys_role_menu`(`role_id`, `menu_id`, `isTotalChecked`) VALUES (1, 762, 1);
+INSERT INTO `sys_role_menu`(`role_id`, `menu_id`, `isTotalChecked`) VALUES (1, 763, 1);
+INSERT INTO `sys_role_menu`(`role_id`, `menu_id`, `isTotalChecked`) VALUES (1, 764, 1);
+INSERT INTO `sys_role_menu`(`role_id`, `menu_id`, `isTotalChecked`) VALUES (1, 765, 1);
+INSERT INTO `sys_role_menu`(`role_id`, `menu_id`, `isTotalChecked`) VALUES (1, 766, 1);
+INSERT INTO `sys_role_menu`(`role_id`, `menu_id`, `isTotalChecked`) VALUES (1, 767, 1);
+INSERT INTO `sys_role_menu`(`role_id`, `menu_id`, `isTotalChecked`) VALUES (1, 768, 1);
+INSERT INTO `sys_role_menu`(`role_id`, `menu_id`, `isTotalChecked`) VALUES (1, 769, 1);
+INSERT INTO `sys_role_menu`(`role_id`, `menu_id`, `isTotalChecked`) VALUES (1, 770, 1);
+INSERT INTO `sys_role_menu`(`role_id`, `menu_id`, `isTotalChecked`) VALUES (1, 771, 1);
+INSERT INTO `sys_role_menu`(`role_id`, `menu_id`, `isTotalChecked`) VALUES (1, 772, 1);
+INSERT INTO `sys_role_menu`(`role_id`, `menu_id`, `isTotalChecked`) VALUES (1, 773, 1);
+INSERT INTO `sys_role_menu`(`role_id`, `menu_id`, `isTotalChecked`) VALUES (1, 774, 1);
+INSERT INTO `sys_role_menu`(`role_id`, `menu_id`, `isTotalChecked`) VALUES (1, 775, 1);
+INSERT INTO `sys_role_menu`(`role_id`, `menu_id`, `isTotalChecked`) VALUES (1, 788, 1);
+INSERT INTO `sys_role_menu`(`role_id`, `menu_id`, `isTotalChecked`) VALUES (1, 789, 1);
+INSERT INTO `sys_role_menu`(`role_id`, `menu_id`, `isTotalChecked`) VALUES (1, 790, 1);
+INSERT INTO `sys_role_menu`(`role_id`, `menu_id`, `isTotalChecked`) VALUES (1, 791, 1);
+INSERT INTO `sys_role_menu`(`role_id`, `menu_id`, `isTotalChecked`) VALUES (1, 792, 1);
+INSERT INTO `sys_role_menu`(`role_id`, `menu_id`, `isTotalChecked`) VALUES (1, 793, 1);
+INSERT INTO `sys_role_menu`(`role_id`, `menu_id`, `isTotalChecked`) VALUES (1, 794, 1);
+INSERT INTO `sys_role_menu`(`role_id`, `menu_id`, `isTotalChecked`) VALUES (1, 795, 1);
+INSERT INTO `sys_role_menu`(`role_id`, `menu_id`, `isTotalChecked`) VALUES (1, 796, 1);
+INSERT INTO `sys_role_menu`(`role_id`, `menu_id`, `isTotalChecked`) VALUES (1, 797, 1);
+INSERT INTO `sys_role_menu`(`role_id`, `menu_id`, `isTotalChecked`) VALUES (1, 798, 1);
+INSERT INTO `sys_role_menu`(`role_id`, `menu_id`, `isTotalChecked`) VALUES (1, 799, 1);
+INSERT INTO `sys_role_menu`(`role_id`, `menu_id`, `isTotalChecked`) VALUES (1, 800, 1);
+INSERT INTO `sys_role_menu`(`role_id`, `menu_id`, `isTotalChecked`) VALUES (1, 801, 1);
+INSERT INTO `sys_role_menu`(`role_id`, `menu_id`, `isTotalChecked`) VALUES (1, 802, 1);
+INSERT INTO `sys_role_menu`(`role_id`, `menu_id`, `isTotalChecked`) VALUES (1, 803, 1);
+INSERT INTO `sys_role_menu`(`role_id`, `menu_id`, `isTotalChecked`) VALUES (1, 804, 1);
+INSERT INTO `sys_role_menu`(`role_id`, `menu_id`, `isTotalChecked`) VALUES (1, 805, 1);
+INSERT INTO `sys_role_menu`(`role_id`, `menu_id`, `isTotalChecked`) VALUES (1, 806, 1);
+INSERT INTO `sys_role_menu`(`role_id`, `menu_id`, `isTotalChecked`) VALUES (1, 807, 1);
+INSERT INTO `sys_role_menu`(`role_id`, `menu_id`, `isTotalChecked`) VALUES (1, 808, 1);
+INSERT INTO `sys_role_menu`(`role_id`, `menu_id`, `isTotalChecked`) VALUES (1, 835, 1);
+INSERT INTO `sys_role_menu`(`role_id`, `menu_id`, `isTotalChecked`) VALUES (1, 836, 1);
+INSERT INTO `sys_role_menu`(`role_id`, `menu_id`, `isTotalChecked`) VALUES (1, 840, 1);
+INSERT INTO `sys_role_menu`(`role_id`, `menu_id`, `isTotalChecked`) VALUES (1, 811, 1);
+INSERT INTO `sys_role_menu`(`role_id`, `menu_id`, `isTotalChecked`) VALUES (1, 812, 1);
+INSERT INTO `sys_role_menu`(`role_id`, `menu_id`, `isTotalChecked`) VALUES (1, 813, 1);
+INSERT INTO `sys_role_menu`(`role_id`, `menu_id`, `isTotalChecked`) VALUES (1, 814, 1);
+INSERT INTO `sys_role_menu`(`role_id`, `menu_id`, `isTotalChecked`) VALUES (1, 815, 1);
+INSERT INTO `sys_role_menu`(`role_id`, `menu_id`, `isTotalChecked`) VALUES (1, 816, 1);
+INSERT INTO `sys_role_menu`(`role_id`, `menu_id`, `isTotalChecked`) VALUES (1, 817, 1);
+INSERT INTO `sys_role_menu`(`role_id`, `menu_id`, `isTotalChecked`) VALUES (1, 818, 1);
+INSERT INTO `sys_role_menu`(`role_id`, `menu_id`, `isTotalChecked`) VALUES (1, 819, 1);
+INSERT INTO `sys_role_menu`(`role_id`, `menu_id`, `isTotalChecked`) VALUES (1, 820, 1);
+INSERT INTO `sys_role_menu`(`role_id`, `menu_id`, `isTotalChecked`) VALUES (1, 821, 1);
+INSERT INTO `sys_role_menu`(`role_id`, `menu_id`, `isTotalChecked`) VALUES (1, 822, 1);
+INSERT INTO `sys_role_menu`(`role_id`, `menu_id`, `isTotalChecked`) VALUES (1, 823, 1);
+INSERT INTO `sys_role_menu`(`role_id`, `menu_id`, `isTotalChecked`) VALUES (1, 824, 1);
+INSERT INTO `sys_role_menu`(`role_id`, `menu_id`, `isTotalChecked`) VALUES (1, 825, 1);
+INSERT INTO `sys_role_menu`(`role_id`, `menu_id`, `isTotalChecked`) VALUES (1, 826, 1);
+INSERT INTO `sys_role_menu`(`role_id`, `menu_id`, `isTotalChecked`) VALUES (1, 827, 1);
+INSERT INTO `sys_role_menu`(`role_id`, `menu_id`, `isTotalChecked`) VALUES (1, 828, 1);
+INSERT INTO `sys_role_menu`(`role_id`, `menu_id`, `isTotalChecked`) VALUES (1, 829, 1);
+INSERT INTO `sys_role_menu`(`role_id`, `menu_id`, `isTotalChecked`) VALUES (1, 830, 1);
+INSERT INTO `sys_role_menu`(`role_id`, `menu_id`, `isTotalChecked`) VALUES (1, 831, 1);
+INSERT INTO `sys_role_menu`(`role_id`, `menu_id`, `isTotalChecked`) VALUES (1, 832, 1);
+INSERT INTO `sys_role_menu`(`role_id`, `menu_id`, `isTotalChecked`) VALUES (1, 834, 1);
+
+
+
+
+
+
+-------
+update sys_menu set type=3 where type=2 and parent_id=106;
+

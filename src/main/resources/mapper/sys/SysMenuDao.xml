@@ -1,0 +1,228 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.eveb.saasops.modules.sys.dao.SysMenuDao">
+
+	<select id="queryObject" resultType="com.eveb.saasops.modules.sys.entity.SysMenuEntity">
+		select * from sys_menu where menu_id = #{value}
+	</select>
+	
+	<insert id="save" parameterType="com.eveb.saasops.modules.sys.entity.SysMenuEntity">
+		insert into sys_menu
+		(
+			`menu_id`, 
+			`parent_id`, 
+			`name`, 
+			`ml`, 
+			`perms`, 
+			`type`, 
+			`icon`, 
+			`order_num`
+		)
+		values
+		(
+			#{menuId}, 
+			#{parentId}, 
+			#{name}, 
+			#{ml}, 
+			#{perms}, 
+			#{type}, 
+			#{icon}, 
+			#{orderNum}
+		)
+	</insert>
+	
+	<select id="queryListParentId" resultType="com.eveb.saasops.modules.sys.entity.SysMenuEntity">
+		select * from sys_menu where parent_id = #{parentId} order by order_num asc 
+	</select>
+	
+	<select id="queryNotButtonList" resultType="com.eveb.saasops.modules.sys.entity.SysMenuEntity">
+		select * from sys_menu where type != 2 order by order_num asc 
+	</select>
+	
+	<select id="getChildMenuList" resultType="com.eveb.saasops.modules.sys.entity.SysMenuEntity">
+		select menu_id menuId,
+			 name,
+			 perms,
+			 type from sys_menu where parent_id = #{menuId}
+	</select>
+	
+	<select id="queryList" resultType="com.eveb.saasops.modules.sys.entity.SysMenuEntity">
+		select m.*,(select p.name from sys_menu p where p.menu_id = m.parent_id) as parentName,(SELECT count(*) from sys_role_menu rm where rm.menu_id = m.menu_id) userCount 
+			from sys_menu m 
+		<choose>
+			<when test="sidx != null and sidx.trim() != ''">
+				order by m.${sidx} ${order}
+			</when>
+			<otherwise>
+				order by m.order_num asc
+			</otherwise>
+		</choose>
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+	
+	<!-- 查询用户的权限列表 --> 
+	<select id="queryUserList" resultType="com.eveb.saasops.modules.sys.entity.SysMenuEntity">
+		select distinct m.*,(select p.name from sys_menu p where p.menu_id = m.parent_id) as parentName
+			from sys_user_role m 
+			LEFT JOIN sys_role_menu rm on m.role_id = rm.role_id 
+			LEFT JOIN sys_menu m on rm.menu_id = m.menu_id 
+		where m.user_id = #{userId} order by m.order_num asc
+	</select>
+	
+	<select id="queryTotal" resultType="int">
+		select count(*) from sys_menu
+	</select>
+	 
+	<update id="update" parameterType="com.eveb.saasops.modules.sys.entity.SysMenuEntity">
+		update sys_menu 
+		<set> 
+			<if test="parentId != null">`parent_id` = #{parentId}, </if>
+			<if test="name != null">`name` = #{name}, </if>
+			<if test="ml != null">`ml` = #{ml}, </if>
+			<if test="perms != null">`perms` = #{perms}, </if>
+			<if test="type != null">`type` = #{type}, </if>
+			<if test="icon != null">`icon` = #{icon}, </if>
+			<if test="orderNum != null">`order_num` = #{orderNum}</if>
+		</set>
+		where menu_id = #{menuId}
+	</update>
+	
+	<delete id="deleteBatch">
+		delete from sys_menu where menu_id in 
+		<foreach item="menuId" collection="array" open="(" separator="," close=")">
+			#{menuId}
+		</foreach>
+		;
+		delete from sys_role_menu where menu_id in 
+		<foreach item="menuId" collection="array" open="(" separator="," close=")">
+			#{menuId}
+		</foreach>
+	</delete>
+
+	<resultMap id="menuTree" type="com.eveb.saasops.modules.sys.entity.SysMenuTree" >
+		<id property="menuId" column="TId"/>
+		<result property="icon" column="TIcon" />
+		<result property="name" column="TName"/>
+		<result property="type" column="Ttype" />
+		<result property="orderNum" column="TOrderNum" />
+		<collection property="children" ofType="com.eveb.saasops.modules.sys.entity.SysMenuTree" >
+			<id property="menuId" column="MId"/>
+			<result property="parentId" column="MPid" />
+			<result property="icon" column="MIcon" />
+			<result property="name" column="MName"/>
+			<result property="url" column="MUrl" />
+			<result property="perms" column="MPerms" />
+			<result property="type" column="Mtype" />
+			<result property="orderNum" column="MOrderNum" />
+			<collection property="children" ofType="com.eveb.saasops.modules.sys.entity.SysMenuTree" >
+				<id property="menuId" column="LId"/>
+				<result property="parentId" column="LPid" />
+				<result property="icon" column="LIcon" />
+				<result property="name" column="LName"/>
+				<result property="url" column="LUrl" />
+				<result property="perms" column="LPerms" />
+				<result property="type" column="Ltype" />
+				<result property="orderNum" column="LOrderNum" />
+			</collection>
+		</collection>
+	</resultMap>
+	<select id="selectTree" resultMap="menuTree" parameterType="java.lang.String">
+		select m.menu_id TId,m.name TName,m.type TType,m.icon TIcon ,m.order_num TOrderNum,
+		m2.menu_id MId,m2.name MName,m2.icon MIcon ,m2.order_num MOrderNum,m2.parent_id MPid,m2.url MUrl,m2.perms MPerms,m2.type Mtype,
+		m3.menu_id LId,m3.name LName,m3.icon LIcon ,m3.order_num LOrderNum,m3.parent_id LPid,m3.url LUrl,m3.perms LPerms,m3.type Ltype
+		from (select m.* from sys_menu  m
+			inner JOIN sys_role_menu rm on rm.menu_id = m.menu_id  and rm.role_id in (${roleIds})
+		where  parent_id = 0 ORDER BY m.order_num ASC )m
+			LEFT JOIN sys_menu m2 on m.menu_id = m2.parent_id
+			inner JOIN sys_role_menu rm1 on rm1.menu_id = m2.menu_id and rm1.role_id in (${roleIds})
+			LEFT JOIN sys_menu m3 on m2.menu_id = m3.parent_id
+			inner JOIN sys_role_menu rm2 on rm2.menu_id = m3.menu_id and rm2.role_id in (${roleIds})
+		ORDER BY TOrderNum,MOrderNum ASC
+	</select>
+
+
+	<select id="selectRoleMenuTree" resultType="com.eveb.saasops.modules.sys.entity.SysMenuTree" parameterType="java.lang.String">
+		select DISTINCT m.* from  sys_menu m inner join sys_role_menu sm on sm.menu_id = m.menu_id and sm.role_id in (${roleIds}) ORDER BY m.order_num ASC
+	</select>
+
+	<resultMap id="queryMenuListAll" type="com.eveb.saasops.modules.sys.dto.TreeMenuDto2">
+		<id property="id" column="FId"/>
+		<result property="label" column="FName"/>
+		<collection property="children" ofType="com.eveb.saasops.modules.sys.dto.TreeMenuDto2" >
+			<id property="id" column="SId"/>
+			<result property="label" column="SName"/>
+				<collection property="children" ofType="com.eveb.saasops.modules.sys.dto.TreeMenuDto2" >
+					<id property="id" column="TId"/>
+					<result property="label" column="TName"/>
+					<collection property="children" ofType="com.eveb.saasops.modules.sys.dto.TreeMenuDto2" >
+						<id property="id" column="LId"/>
+						<result property="label" column="LName"/>
+					</collection>
+				</collection>
+		</collection>
+	</resultMap>
+
+	<select id="queryMenuList" resultMap="queryMenuListAll" >
+		select F.menu_id FId,F.name FName,S.menu_id SId,S.name SName,T.menu_id TId,T.name TName,L.menu_id LId,L.name LName from (select *  from sys_menu where parent_id = 0) F
+		LEFT JOIN (select *  from sys_menu where parent_id != 0 and type != 2) S on S.parent_id = F.menu_id
+		LEFT JOIN (select *  from sys_menu where parent_id != 0) T on T.parent_id = S.menu_id
+		LEFT JOIN (select *  from sys_menu where type =2 ) L on L.parent_id = T.menu_id
+		order by  F.parent_id,F.order_num,S.parent_id,S.order_num asc
+	</select>
+
+	<select id="queryAllMenu" resultType="com.eveb.saasops.modules.sys.entity.SysMenuEntity">
+		select * from sys_menu where type != 2 order by parent_id asc , order_num asc
+	</select>
+
+    <select id="queryAll" resultType="com.eveb.saasops.modules.sys.entity.SysMenuEntity">
+        select * from sys_menu
+    </select>
+
+	<resultMap id="queryMenuAuth" type="com.eveb.saasops.modules.sys.dto.TreeMenuDto2">
+		<id property="id" column="pId"/>
+		<result property="label" column="pName"/>
+		<collection property="children" ofType="com.eveb.saasops.modules.sys.dto.TreeMenuDto2" >
+			<id property="id" column="cId"/>
+			<result property="label" column="cName"/>
+            <collection property="children" ofType="com.eveb.saasops.modules.sys.dto.TreeMenuDto2" >
+                <id property="id" column="lId"/>
+                <result property="label" column="lName"/>
+                <collection property="children" ofType="com.eveb.saasops.modules.sys.dto.TreeMenuDto2" >
+                    <id property="id" column="nId"/>
+                    <result property="label" column="nName"/>
+                </collection>
+            </collection>
+		</collection>
+	</resultMap>
+
+	<select id="queryMenuAuth" resultMap="queryMenuListAll">
+		select p.menu_id pId ,p.name pName ,c.menu_id cId ,c.name cName,l.menu_id lId ,l.name lName,n.menu_id nId ,n.name nName from sys_menu p
+		left join sys_menu c on p.menu_id = c.parent_id
+		left join sys_menu l on c.menu_id = l.parent_id
+		left join sys_menu n on l.menu_id = n.parent_id
+		 where
+		 p.menu_id = #{menuId}
+	</select>
+
+
+	<select id="findMenuByColumn" resultType="com.eveb.saasops.modules.sys.entity.SysRoleMenuEntity" parameterType="java.util.Set">
+		SELECT menu_id 
+          FROM sys_menu 
+         where columnName in (
+			  select columnName 
+			    from sys_menu 
+		 	    <where>
+  		  	        <if test="paramList != null and paramList.size()>0">
+  		  	   	        menu_id in 
+	                    <foreach collection="paramList" open="(" close=")" separator="," item="param">
+	                        #{param}
+	                    </foreach>
+                    </if>
+                    and columnName is not null
+  		        </where>
+		) and type!=3
+	</select>
+</mapper>

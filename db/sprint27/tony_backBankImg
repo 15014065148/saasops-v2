@@ -1,0 +1,27 @@
+-- 取款银行卡图片：
+
+alter table t_bs_bank add column backBankImg varchar(80) DEFAULT NULL COMMENT '取款显示的银行卡背景图片' after bankLog;
+
+update t_bs_bank set backBankImg ='http://img-ybh.oduosa.com/Fqb5McOhF7IzPS0a_G2Md5pkHK0s' where bankName='上海农商行'; -- 上海农商行
+update t_bs_bank set backBankImg ='http://img-ybh.oduosa.com/Fq0iMFfsUc5dl531WRfddgzzXGk5' where bankName='上海银行'; -- 上海银行
+update t_bs_bank set backBankImg ='http://img-ybh.oduosa.com/FjFBgrmiaCPFsNwe8zIQkB6rZXOy' where bankName='东亚银行'; -- 东亚银行
+update t_bs_bank set backBankImg ='http://img-ybh.oduosa.com/Fn__2-nV107jqrT3DlFoFqModZFp' where bankName='中信银行'; -- 中信银行
+update t_bs_bank set backBankImg ='http://img-ybh.oduosa.com/FjegZb5pR0ISczY97ZEvtTr8Qp_-' where bankName='中国光大银行'; -- 中国光大银行
+update t_bs_bank set backBankImg ='http://img-ybh.oduosa.com/Fsns-Dg_d45qI-YROVL7erRWsldP' where bankName='中国农业银行'; -- 中国农业银行
+update t_bs_bank set backBankImg ='http://img-ybh.oduosa.com/FnwuDzbik8pRwOU1iEAFj4xqa2TK' where bankName='中国工商银行'; -- 中国工商银行
+update t_bs_bank set backBankImg ='http://img-ybh.oduosa.com/Fsq6Hy1LpqNTMwggw0VcGA6YQxse' where bankName='中国建设银行'; -- 中国建设银行
+update t_bs_bank set backBankImg ='http://img-ybh.oduosa.com/FvQ88vw0FsTekW1O1eFbXrTPcyzc' where bankName='中国邮政储蓄银行'; -- 中国邮政储蓄银行
+update t_bs_bank set backBankImg ='http://img-ybh.oduosa.com/Fi-EHL3GFozLHzKuXIZqmyB9qfrr' where bankName='中国银行'; -- 中国银行
+update t_bs_bank set backBankImg ='http://img-ybh.oduosa.com/FujwSBZ7UH7qHE0tETJuzXmtJqWy' where bankName='兴业银行'; -- 兴业银行
+update t_bs_bank set backBankImg ='http://img-ybh.oduosa.com/Fm8oUiFM0BumKcUtjpmMnWBgF3_B' where bankName='北京农商银行'; -- 北京农商银行
+update t_bs_bank set backBankImg ='http://img-ybh.oduosa.com/Fg1mpgibeeCA1QOm6MWNMzxfDRy4' where bankName='北京银行'; -- 北京银行
+update t_bs_bank set backBankImg ='http://img-ybh.oduosa.com/FkG37O7WXMJO4zwi16zmi-jTrmSE' where bankName='华夏银行'; -- 华夏银行
+update t_bs_bank set backBankImg ='http://img-ybh.oduosa.com/Ft4khnv-zYWtrZdFcbnZBOeJQkmu' where bankName='南京银行'; -- 南京银行
+update t_bs_bank set backBankImg ='http://img-ybh.oduosa.com/FhAc6-ZEVnoYSWhQdEC-yRuKD3IE' where bankName='宁波银行'; -- 宁波银行
+update t_bs_bank set backBankImg ='http://img-ybh.oduosa.com/FshdrEAmbNpu_ENTcYcOMfsSSC28' where bankName='平安银行'; -- 平安银行
+update t_bs_bank set backBankImg ='http://img-ybh.oduosa.com/FpkFLCkxgibVssODN4Lcv3yi7tPe' where bankName='广发银行'; -- 广发银行
+update t_bs_bank set backBankImg ='http://img-ybh.oduosa.com/FgNbDaEH4qr_yTHlX__Rm9IlJgmZ' where bankName='招商银行'; -- 招商银行
+update t_bs_bank set backBankImg ='http://img-ybh.oduosa.com/FgobM9H3Y8VbVBBNqYBCHqWHNWjp' where bankName='民生银行'; -- 民生银行
+update t_bs_bank set backBankImg ='http://img-ybh.oduosa.com/FuXEY5XliTkzwWZUA9ejFmwdWAgE' where bankName='浦发银行'; -- 浦发银行
+update t_bs_bank set backBankImg ='http://img-ybh.oduosa.com/Foo8vCVcV_OYhEy1J3epjAvgsvpU' where bankName='深圳发展银行'; -- 深圳发展银行
+update t_bs_bank set backBankImg ='http://img-ybh.oduosa.com/FmSopnUj8A309aEbG7lb6noWqdub' where bankName='渤海银行'; -- 渤海银行

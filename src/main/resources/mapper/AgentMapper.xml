@@ -1,0 +1,235 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="com.eveb.saasops.modules.agent.mapper.AgentMapper">
+
+	<resultMap type="com.eveb.saasops.modules.agent.entity.AgentAccount"
+		id="AgentAccountResultMap">
+		<id property="id" column="id" />
+		<collection property="commissions" select="findCommissionNameByAccId"
+			column="id" />
+	</resultMap>
+
+	<select id="findAccountListPage" resultMap="AgentAccountResultMap"
+		parameterType="com.eveb.saasops.modules.agent.entity.AgentAccount">
+		SELECT t.*,( SELECT count(*) FROM mbr_account WHERE tagencyId = t.id)
+		accountNum FROM agy_account t
+		<include refid="account_where" />
+	</select>
+
+	<select id="findAccountList" resultType="com.eveb.saasops.modules.agent.entity.AgentAccount"
+		parameterType="com.eveb.saasops.modules.agent.entity.AgentAccount">
+		SELECT * FROM agy_account t
+		<include refid="account_where" />
+	</select>
+	
+	<select id="findAllSubAgency" resultType="com.eveb.saasops.modules.agent.entity.AgentAccount" >
+		 select * from agy_account where parentId <![CDATA[ <> ]]> 0 and available=1
+	</select>
+	
+	<select id="getAgentAccountAuth" resultType="com.eveb.saasops.modules.agent.entity.AgentAccount"
+		parameterType="com.eveb.saasops.modules.agent.entity.AgentAccount">
+		SELECT * FROM agy_account
+		<where>
+			1=1
+			<if test=" parentIds != null">
+				AND parentId in (${parentIds})
+			</if>
+			<if test="available != null and available != ''">
+				AND available= #{available}
+			</if>
+		</where>
+	</select>
+
+	<select id="findSubordinateAccListPage" resultType="com.eveb.saasops.modules.agent.entity.AgentAccount"
+		parameterType="com.eveb.saasops.modules.agent.entity.AgentAccount">
+		SELECT
+		t.*, ac.agyAccount agyTopAccount,cn.commnName,wt.balance,
+		(SELECT count(1) FROM mbr_account WHERE cagencyId = t.id ) accountNum
+		FROM
+		agy_account t
+		INNER JOIN agy_account ac ON ac.id = t.parentId
+		INNER JOIN agy_acc_commn an ON t.id = an.accId
+		INNER JOIN agy_commission cn ON an.commnId = cn.id
+		LEFT JOIN agy_wallet wt ON t.id = wt.accountId
+		<include refid="account_where" />
+		AND t.parentId > 0
+	</select>
+
+	<sql id="account_where">
+		<where>
+			<if test="id != null">
+				AND t.id= #{id}
+			</if>
+			<if test="baseAuth.agyAccountIds != null and baseAuth.agyAccountIds != ''">
+				AND t.id IN (${baseAuth.agyAccountIds})
+			</if>
+			<if test="baseAuth.agyAccountIds == null or baseAuth.agyAccountIds == ''">
+				AND t.id = -1
+			</if>
+			<if test="agyAccount != null and agyAccount != ''">
+				AND t.agyAccount LIKE CONCAT('%',#{agyAccount}, '%')
+			</if>
+			<if test="available != null and available != ''">
+				AND t.available= #{available}
+			</if>
+			<if test="agyType != null">
+				AND t.agyType= #{agyType}
+			</if>
+			<if test="createTimeFrom != null and createTimeFrom != ''">
+				AND t.createTime <![CDATA[ >= ]]>#{createTimeFrom}
+			</if>
+			<if test="createTimeTo != null and createTimeTo != ''">
+				AND t.createTime <![CDATA[ <= ]]>#{createTimeTo}
+			</if>
+			<if test="parentId != null">
+				AND t.parentId =#{parentId}
+			</if>
+			<if test="agyTopAccount != null and agyTopAccount != ''">
+				AND ac.agyAccount LIKE CONCAT('%',#{agyTopAccount}, '%')
+			</if>
+		</where>
+	</sql>
+
+	<select id="findAccountByName" resultType="java.lang.Integer">
+		SELECT count(*) FROM agy_account WHERE agyAccount= #{agyAccount}
+	</select>
+
+	<select id="findCommissionListPage" resultType="com.eveb.saasops.modules.agent.entity.Commission">
+		SELECT an.*,(select count(1) from agy_acc_commn
+		<where>
+			commnId = an.id
+			<if
+				test=" baseAuth.agyAccountIds != null and baseAuth.agyAccountIds != '' ">
+				AND accId in (${baseAuth.agyAccountIds})
+			</if>
+			<if
+				test=" baseAuth.agyAccountIds == null and baseAuth.agyAccountIds == '' ">
+				AND accId = -1
+			</if>
+		</where>
+		) accCount FROM agy_commission an
+		<where>
+			<if test="id != null">
+				AND an.id = #{id}
+			</if>
+			<if test="commnName != null and commnName != ''">
+				AND an.commnName LIKE CONCAT('%',#{commnName}, '%')
+			</if>
+			<if test="createUser != null and createUser != ''">
+				AND an.createUser LIKE CONCAT('%',#{createUser}, '%')
+			</if>
+			<if test="available != null and available != '' or available == 0">
+				AND an.available= #{available}
+			</if>
+		</where>
+
+	</select>
+
+	<!--查询未配置域名的代理账号 -->
+	<select id="queryAgyCountNoUrl" resultType="java.util.Map">
+		SELECT id,agyAccount FROM agy_account
+		<where>
+			id not in ( SELECT agencyId FROM set_basic_agencyUrl )
+		</where>
+	</select>
+	<select id="queryAgyTotal" resultType="com.eveb.saasops.modules.agent.entity.AgentAccount"
+		parameterType="com.eveb.saasops.modules.agent.entity.AgentAccount">
+		SELECT * from agy_account A
+		INNER JOIN (
+		SELECT DISTINCT parentId from agy_account
+		<where>
+			<if
+				test=" baseAuth.agyAccountIds != null and baseAuth.agyAccountIds != '' ">
+				id in(${baseAuth.agyAccountIds})
+			</if>
+		</where>
+		) B on A.id =B.parentId
+	</select>
+<!-- 查总代 -->
+	<select id="queryGenAgt" parameterType="com.eveb.saasops.modules.operate.dto.AgyAccountDto"
+		resultType="com.eveb.saasops.modules.agent.entity.AgentAccount">
+		SELECT
+		agy.*
+		FROM
+		agy_account agy
+		<include refid="genAgt_where"></include>
+	</select>
+	<sql id="genAgt_where">
+		<where>
+			agy.parentId = 0
+			<if test="agyAccount!=null and agyAccount != ''">
+				AND agy.agyAccount LIKE CONCAT('%',#{agyAccount},'%')
+			</if>
+			<if test="genAgtId!=null">
+				AND agy.id = #{genAgtId}
+			</if>
+			
+		</where>
+	</sql>
+	
+<!-- 查分代 -->
+	<select id="queryAgyList" parameterType="com.eveb.saasops.modules.operate.dto.AgyAccountDto"
+		resultType="com.eveb.saasops.modules.agent.entity.AgentAccount">
+		select agy.* from agy_account agy
+		<include refid="agt_where"></include>
+	</select>
+	
+	<sql id="agt_where">
+		<if test="agyAccount!=null and agyAccount != ''">
+				AND agy.agyAccount LIKE CONCAT('%',#{agyAccount},'%')
+		</if>
+		<if test="agtIds!=null">
+	  		AND agy.id in 
+	  		<foreach collection="agtIds" item="agtId" open="(" close=")" separator=",">
+	  			#{agtId}
+	  		</foreach>	
+	  	</if>	
+	</sql>
+	
+	<select id="queryAgentList" parameterType="com.eveb.saasops.modules.operate.dto.AgyAccDto"
+		resultType="com.eveb.saasops.modules.agent.entity.AgentAccount">
+		select agy.* from agy_account agy
+		<include refid="agent_where"></include>
+	</select>
+	
+	<sql id="agent_where">
+		<where>
+			<if test="loginName and loginName != ''">
+				AND agy.agyAccount LIKE CONCAT('%',#{loginName},'%')
+			</if>			
+		</where>
+	</sql>
+	<select id="selectGenAgy" resultType="com.eveb.saasops.modules.agent.entity.AgentAccount"
+		parameterType="com.eveb.saasops.modules.operate.dto.AgyAccDto">
+		select agy.*from agy_account agy
+		where agy.parentId = 0
+	</select>
+	
+	<select id="selectByPrimaryKey" resultType="com.eveb.saasops.modules.agent.entity.AgentAccount">
+		select agy.*from agy_account agy
+		where id = #{value}
+	</select>
+	
+	<select id="getAllLocalAgentAccount" resultType="integer">
+		select id from agy_account where parentId  in ( SELECT id from agy_account where parentId = 0) and available = 1
+	</select>
+
+	<resultMap id="agentTree" type="com.eveb.saasops.modules.agent.entity.AgentTree" >
+		<id property="id" column="PId"/>
+		<result property="label" column="PAgyAccount" />
+		<result property="parentId" column="PParentId"/>
+		<collection property="children" ofType="com.eveb.saasops.modules.agent.entity.AgentTree" >
+			<id property="id" column="CId"/>
+			<result property="label" column="CAgyAccount" />
+			<result property="parentId" column="CParentId"/>
+		</collection>
+	</resultMap>
+
+	<select id="selectAgentTree" resultMap="agentTree" >
+		 SELECT P.id PId, P.parentId PParentId,P.agyAccount PAgyAccount,C.id CId, C.parentId CParentId,C.agyAccount CAgyAccount from (SELECT id ,agyAccount ,parentId FROM agy_account WHERE available = 1 AND parentId = 0) P
+		 LEFT JOIN (SELECT id ,agyAccount ,parentId FROM agy_account WHERE available = 1 AND parentId != 0 ) C ON P.id = C.parentId
+	</select>
+	
+
+</mapper>

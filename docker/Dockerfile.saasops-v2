@@ -1,0 +1,7 @@
+FROM openjdk:8-jdk-alpine
+
+ADD ./target/saasops-v2-0.2.jar /saasops-v2-0.2.jar
+
+ENTRYPOINT ["java", "-jar", "saasops-v2-0.2.jar"]
+
+CMD []

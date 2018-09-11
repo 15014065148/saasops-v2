@@ -1,0 +1,5 @@
+-- 会员入款菜单顺序调整
+update sys_menu set order_num=3 where menu_id=838; -- 调整会员入款菜单的顺序
+update sys_menu set order_num=5 where menu_id=147; -- 调整会员提款菜单的顺序
+update sys_menu set order_num=6 where menu_id=209; -- 调整资金调整菜单的顺序
+update sys_menu set order_num=7 where menu_id=198; -- 调整户内转账菜单的顺序

@@ -1,0 +1,661 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="com.eveb.saasops.modules.member.mapper.MbrMapper">
+    <insert id="insertOrUpdateToken" parameterType="com.eveb.saasops.modules.member.entity.MbrToken">
+		insert into
+		mbr_token(`accountId`,`loginName`,`token`) values
+		(#{accountId},
+		#{loginName}, #{token}) on duplicate key update
+		token=values(token)
+	</insert>
+    <select id="findGroupList" resultType="com.eveb.saasops.modules.member.entity.MbrGroup"
+            parameterType="com.eveb.saasops.modules.member.entity.MbrGroup">
+        select t1.id,t1.id groupId,t1.groupName,ifnull(t4.mbrNums,0)
+        mbrNums,t1.available,t1.memo,t1.isDef,t2.lowQuota,t2.topQuota,
+        case when
+        t2.feeAvailable=1 then IFNULL(concat(t2.feeScale,'%'),null) end
+        depositFee,t2.feeHours,
+        t2.feeTimes,t3.withDrawalQuota,t3.lowQuota
+        wLowQuota,t3.topQuota wTopQuota,
+        case when t3.feeway=0 then
+        ifnull(concat(t3.feeScale,'%'),null) else t3.feeFixed end
+        withdrawalFee,
+        t3.feeHours
+        wfeeHours,t3.feeTimes wfeeTimes,t2.id
+        did,t3.id wid,case when t2.id is not null and t3.id is not null then 1
+        else 0 end groupDone from mbr_group t1
+        left join mbr_deposit_cond t2 on
+        t1.id=t2.groupId
+        left join
+        mbr_withdrawal_cond t3 on t1.id=t3.groupId
+        left join (select count(1)
+        mbrNums,groupId from mbr_account group by
+        groupId) t4 on
+        t1.id=t4.groupId
+        <include refid="group_where"/>
+    </select>
+
+    <select id="findAccountList" resultType="com.eveb.saasops.modules.member.entity.MbrAccount"
+            parameterType="com.eveb.saasops.modules.member.entity.MbrAccount">
+        select
+        <if test="columnSets != null and columnSets.size()>0">
+            <foreach item="columnName" collection="columnSets" separator=",">
+                tt.${columnName}
+            </foreach>
+        </if>
+        from (
+        select DISTINCT
+        t3.*,t4.registerIp,t4.registerUrl,t4.registerSource,t5.groupName,
+        (SELECT createTime FROM fund_deposit WHERE accountId=t3.id AND`status`=1 LIMIT 1 ) AS depositTime
+        from(select
+        t1.*,0 totalBalance,0 totalDeposit,0
+        totalWithdrawal,t0.agyAccount,t0.id agyAccountId
+        from mbr_account
+        t1,agy_account t0 where
+        t0.id=t1.cagencyId)t3 left
+        join log_mbrregister
+        t4 on t3.loginName=t4.loginName left join
+        mbr_group t5 on t3.groupId=t5.id
+        <include refid="account_where"/>
+        <!-- order by t3.isOnline desc,t3.loginName asc -->
+        )tt
+    </select>
+
+    <select id="findAccountOnlineList"
+            resultType="com.eveb.saasops.modules.member.entity.MbrAccountOnline"
+            parameterType="com.eveb.saasops.modules.member.entity.MbrAccountOnline">
+        select
+        t4.*,IFNULL(t5.onlineTime,0)onlineTime,t6.loginTime,t6.loginIp,t6.loginArea,t6.loginUrl,t6.logoutTime
+        from (select
+        t1.id,t1.groupId,t1.loginName,t1.isOnline,t1.tagencyId,t1.cagencyId,t1.loginSource,t2.groupName,t3.agyAccount,t3.id
+        agyAccountId,0 totalBalance from
+        mbr_account t1, mbr_group t2,agy_account t3 where t1.groupId=t2.id and
+        t1.cagencyId=t3.id)t4
+        left join(select sum(ifnull(onlineTime,0)) onlineTime, loginName from
+        log_mbrlogin group by loginName) t5 on t4.loginName=t5.loginName
+        left join(select log1.* from log_mbrlogin log1,(select max(id)
+        id,loginName from log_mbrlogin group by loginName) log2 where
+        log1.id=log2.id)t6 on t4.loginName=t6.loginName
+        <include refid="accountOnline_where"/>
+    </select>
+
+
+    <select id="viewOtherAccount" resultType="com.eveb.saasops.modules.member.entity.MbrAccount"
+            parameterType="java.lang.Integer">
+        select
+        <if test="columnSets != null and columnSets.size()>0">
+            <foreach item="columnName" collection="columnSets" separator=",">
+                tt.${columnName}
+            </foreach>
+        </if>
+        from (
+        select t.id,
+        t.available,
+        t.groupId,
+        t.isOnline,
+        t.tagencyId,
+        t.cagencyId,
+        w.balance as totalBalance
+        from mbr_account t,
+        mbr_wallet w
+        where t.id = w.accountId
+        and t.id = #{id}
+        )tt
+    </select>
+
+
+    <select id="viewAccount" resultType="com.eveb.saasops.modules.member.entity.MbrAccount"
+            parameterType="java.lang.Integer">
+        select
+        <if test="columnSets != null and columnSets.size()>0">
+            <foreach item="columnName" collection="columnSets" separator=",">
+                tt.${columnName}
+            </foreach>
+        </if>
+        from (
+        SELECT
+        t1.id,
+        t1.email,
+        t1.realName,
+        t1.mobile,
+        t1.qq,
+        t1.weChat,
+        t1.loginName,
+        logr.registerTime,
+        logr.registerIp,
+        logr.registerUrl,
+        ( SELECT loginTime FROM log_mbrlogin WHERE accountId = t1.id ORDER BY logoutTime DESC LIMIT 1 ) loginTime,
+        ( SELECT loginIp FROM log_mbrlogin WHERE accountId = t1.id ORDER BY loginTime DESC LIMIT 1 ) loginIp
+        FROM
+        mbr_account t1,
+        log_mbrregister logr
+        WHERE
+        t1.id = logr.accountId
+        AND t1.id =#{id}
+        )tt
+    </select>
+    <!-- <select id="viewAccount" resultType="com.eveb.saasops.modules.member.entity.MbrAccount"
+            parameterType="java.lang.Integer">
+		select
+		t1.*,t2.accountId,t2.balance,0 totalBalance,0
+		totalDeposit,0 totalWithdrawal,t3.agyAccount,t4.agyAccount
+		tagyAccount
+		from
+		mbr_account t1,agy_account t3,mbr_wallet t2,agy_account
+		t4 where
+		t1.id=t2.accountId and
+		t1.cagencyId=t3.id and
+		t1.tagencyId=t4.id and
+		t1.id=#{id}
+	</select> -->
+    <select id="findAccountWallet"
+            resultType="com.eveb.saasops.modules.member.entity.MbrDepotWallet"
+            parameterType="com.eveb.saasops.modules.member.entity.MbrDepotWallet">
+        select * from mbr_depot_wallet where accountId=#{accountId}
+        <if test="depotIds != null">
+            and depotId in
+            <foreach item="depotId" index="index" collection="depotIds"
+                     open="(" separator="," close=")">
+                #{depotId}
+            </foreach>
+        </if>
+    </select>
+
+    <select id="findDepots" resultType="com.eveb.saasops.modules.member.entity.MbrDepotWallet">
+        select * from mbr_depot_wallet where accountId=#{accountId}
+    </select>
+    <select id="findBankCardOne" resultType="com.eveb.saasops.modules.member.entity.MbrBankcard"
+            parameterType="java.lang.Integer">
+		select * from mbr_bankcard where available=1 and isdel=0
+		and
+		accountId=#{id} limit 1
+	</select>
+    <select id="selectGroupCount" resultType="java.lang.Integer">
+        select count(1) nums from mbr_account where groupId in
+        <foreach item="id" collection="array" open="(" separator=","
+                 close=")">
+            #{id}
+        </foreach>
+    </select>
+
+
+    <sql id="group_where">
+        <where>
+            <if test="groupIdList != null and groupIdList !='' ">
+                AND t1.Id in ( ${groupIdList} )
+            </if>
+            <if test="baseAuth != null">
+                <choose>
+                    <when test="baseAuth.groupIds != null and baseAuth.groupIds != '' ">
+                        AND t1.Id in ( ${baseAuth.groupIds} )
+                    </when>
+                    <otherwise>
+                        AND t1.Id = -1
+                    </otherwise>
+                </choose>
+            </if>
+            <if test="availableList != null and availableList !='' ">
+                AND t1.available in ( ${availableList} )
+            </if>
+        </where>
+    </sql>
+
+    <sql id="account_where">
+        <where>
+            <if test="groupIdList != null and groupIdList.size()>0">
+                AND t3.groupId in
+                <foreach item="groupId" collection="groupIdList" open="(" separator="," close=")">
+                    #{groupId}
+                </foreach>
+            </if>
+            <if test="baseAuth != null">
+                <choose>
+                    <when test="baseAuth.groupIds != null and baseAuth.groupIds != '' and baseAuth.agyAccountIds != null and baseAuth.agyAccountIds !='' ">
+                        <if test="baseAuth.groupIds != null and baseAuth.groupIds != '' ">
+                            AND t3.groupId in ( ${baseAuth.groupIds} )
+                        </if>
+                        <if test="baseAuth.agyAccountIds != null and baseAuth.agyAccountIds !='' ">
+                            AND t3.agyAccountId in ( ${baseAuth.agyAccountIds} )
+                        </if>
+                    </when>
+                    <otherwise>
+                        AND t3.groupId = -1
+                    </otherwise>
+                </choose>
+            </if>
+            <if test="loginName != null and loginName!=''">
+                AND t3.loginName like concat('%',#{loginName},'%')
+            </if>
+            <if test="registerTime != null and registerTime!=''">
+                AND t3.registerTime&gt;=#{registerTime}
+            </if>
+            <if test="registerTimeEnd != null and registerTimeEnd!=''">
+                AND t3.registerTime&lt;=#{registerTimeEnd}
+            </if>
+            <if test="loginTime != null and loginTime!=''">
+                AND t3.loginTime&gt;=#{loginTime}
+            </if>
+            <if test="loginTimeEnd != null and loginTimeEnd!=''">
+                AND t3.loginTime&lt;=#{loginTimeEnd}
+            </if>
+            <if test="realName != null and realName!=''">
+                AND t3.realName like concat('%',#{realName},'%')
+            </if>
+            <if test="mobile != null and mobile!=''">
+                AND t3.mobile like concat('%',#{mobile},'%')
+            </if>
+            <if test="email != null and email!=''">
+                AND t3.email like concat('%',#{email},'%')
+            </if>
+            <if test="registerUrl != null and registerUrl!=''">
+                AND t4.registerUrl like concat('%',#{registerUrl},'%')
+            </if>
+            <if test="qq != null and qq!=''">
+                AND t3.qq like concat('%',#{qq},'%')
+            </if>
+            <if test="registerSourceList != null and registerSourceList !='' ">
+                AND t4.registerSource in ( ${registerSourceList} )
+            </if>
+            <if test="isOnlineList != null and isOnlineList !='' ">
+                AND t3.isOnline in ( ${isOnlineList} )
+            </if>
+            <if test="tagencyIdList != null and tagencyIdList !='' ">
+                AND t3.tagencyId in ( ${tagencyIdList} )
+            </if>
+            <if test="cagencyIdList != null and cagencyIdList !='' ">
+                AND t3.cagencyId in ( ${cagencyIdList} )
+            </if>
+            <if test="availableList != null and availableList !='' ">
+                AND t3.available in ( ${availableList} )
+            </if>
+            <if test="loginSourceList != null and loginSourceList !='' ">
+                AND t3.loginSource in ( ${loginSourceList} )
+            </if>
+        </where>
+    </sql>
+
+    <sql id="accountOnline_where">
+        <where>
+            <if test="isOnline != null">
+                AND t4.isOnline=#{isOnline}
+            </if>
+            <if test="groupIdList != null">
+                AND t4.groupId in (#{groupIdList})
+            </if>
+            <if test="loginName != null and loginName!=''">
+                AND t4.loginName like concat('%',#{loginName},'%')
+            </if>
+            <if test="tagencyIdList != null">
+                AND t4.tagencyId in (#{tagencyIdList})
+            </if>
+            <if test="cagencyIdList != null">
+                AND t4.cagencyId in (#{cagencyIdList})
+            </if>
+            <if test="loginTime != null and loginTime!=''">
+                AND t6.loginTime&gt;=#{loginTime}
+            </if>
+            <if test="loginTimeEnd != null and loginTimeEnd!=''">
+                AND t6.loginTime&lt;=#{loginTimeEnd}
+            </if>
+            <if test="loginSourceList != null and loginSourceList!=''">
+                AND t4.loginSource in (${loginSourceList})
+            </if>
+            <if test="baseAuth != null">
+                <choose>
+                    <when test="baseAuth.groupIds != null and baseAuth.groupIds != '' and baseAuth.agyAccountIds != null and baseAuth.agyAccountIds !='' ">
+                        <if test="baseAuth.groupIds != null and baseAuth.groupIds != '' ">
+                            AND t4.groupId in ( ${baseAuth.groupIds} )
+                        </if>
+                        <if test="baseAuth.agyAccountIds != null and baseAuth.agyAccountIds !='' ">
+                            AND t4.agyAccountId in ( ${baseAuth.agyAccountIds} )
+                        </if>
+                    </when>
+                    <otherwise>
+                        AND t4.groupId = -1
+                    </otherwise>
+                </choose>
+            </if>
+        </where>
+
+    </sql>
+
+    <select id="listAccName" resultType="com.eveb.saasops.modules.member.entity.MbrAccount">
+        select loginName,id from mbr_account where id in
+        <foreach item="id" collection="array" open="(" separator=","
+                 close=")">
+            #{id}
+        </foreach>
+    </select>
+    <update id="updateBankCardBatch">
+        update mbr_bankcard set isdel=1 where id in
+        <foreach item="id" index="index" collection="array" open="("
+                 separator="," close=")">
+            #{id}
+        </foreach>
+    </update>
+
+    <update id="updateGroupBatch">
+        update mbr_account set groupId=#{groupId} where id in
+        <foreach item="id" index="index" collection="idArr" open="("
+                 separator="," close=")">
+            #{id}
+        </foreach>
+    </update>
+    <update id="updateStateBatch">
+        update mbr_account set available=#{available} where id in
+        <foreach item="id" index="index" collection="idArr" open="("
+                 separator="," close=")">
+            #{id}
+        </foreach>
+    </update>
+    <update id="updateGroupAvil">
+		update mbr_group set available=#{available} where
+		id=#{id} and isDef=#{isDef}
+	</update>
+
+    <update id="walletSubtract" parameterType="com.eveb.saasops.modules.member.entity.MbrWallet">
+		update mbr_wallet set
+		balance=balance+#{bonusAmount}-#{balance} where
+		accountId=#{accountId} AND
+		balance+#{bonusAmount}-#{balance}>=0 AND #{balance} > 0
+	</update>
+
+    <update id="walletAdd" parameterType="com.eveb.saasops.modules.member.entity.MbrWallet">
+		update mbr_wallet set
+		balance=balance+#{balance} where
+		accountId=#{accountId} and
+		#{balance}>=0
+	</update>
+
+    <delete id="deleteGroupBatch">
+        delete
+        mbr_group,mbr_deposit_cond,mbr_withdrawal_cond from mbr_group
+        LEFT JOIN
+        mbr_deposit_cond ON mbr_group.id=mbr_deposit_cond.groupId
+        left join
+        mbr_withdrawal_cond ON
+        mbr_group.id=mbr_withdrawal_cond.groupId
+        where isDef=0 and
+        mbr_group.id
+        in
+        <foreach item="id" collection="array" open="(" separator=","
+                 close=")">
+            '${id}'
+        </foreach>
+    </delete>
+    <delete id="deleteAccountBatch">
+        delete mbr_account where id in
+        <foreach item="id" collection="array" open="(" separator=","
+                 close=")">
+            #{id}
+        </foreach>
+    </delete>
+    <delete id="deleteMemoBatch">
+        delete mbr_memo where id in
+        <foreach item="id" collection="array" open="(" separator=","
+                 close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <!--<select id="getMember" resultType="com.eveb.saasops.modules.member.entity.MbrGroup">
+        select * from mbr_group </select> -->
+
+    <select id="getMemberAccountNames" parameterType="com.eveb.saasops.modules.member.entity.MbrAccount"
+            resultType="java.lang.String">
+        select loginName from mbr_account
+        <where>
+            <if test="groupId != null">
+                AND groupId=#{groupId}
+            </if>
+            <if test="tagencyId != null">
+                AND tagencyId=#{tagencyId}
+            </if>
+            <if test="cagencyId != null">
+                AND cagencyId=#{cagencyId}
+            </if>
+        </where>
+    </select>
+    <!-- <select id="getMbrWallet" parameterType="com.eveb.saasops.modules.member.entity.MbrWallet"
+        resultType="com.eveb.saasops.modules.member.entity.MbrWallet"> select t1.*,t2.available
+        from mbr_wallet t1,mbr_account t2 <where> t1.accountId=t2.id <if test="accountId
+        != null"> AND t1.accountId=#{accountId} </if> <if test="depotId != null">
+        AND t1.depotId=#{depotId} </if> <if test="depotName != null and depotName!=''">
+        AND t1.depotName=#{depotName} </if> <if test="loginName != null and loginName!=''">
+        AND t1.loginName=#{loginName} </if> <if test="pwd != null and pwd!=''"> AND
+        t1.pwd=#{pwd} </if> </where> </select> -->
+    <update id="updateBillManageStatus"
+            parameterType="com.eveb.saasops.modules.member.entity.MbrBillManage">
+        update mbr_bill_manage
+        <set>
+            <if test="status != null">`status` = #{status},</if>
+            <if test="depotAfterBalance != null">`depotAfterBalance` = #{depotAfterBalance},</if>
+            <if test="afterBalance != null">`afterBalance` = #{afterBalance},</if>
+            <if test="beforeBalance != null">`beforeBalance` = #{beforeBalance},</if>
+        </set>
+        where id = #{id} and status=0
+    </update>
+    <select id="userBankCard" parameterType="com.eveb.saasops.modules.member.entity.MbrBankcard"
+            resultType="com.eveb.saasops.modules.member.entity.MbrBankcard">
+        select t1.*,t2.bankLog ,t2.backBankImg from mbr_bankcard t1 left join t_bs_bank t2 on
+        t1.bankName=t2.bankName
+        <where>
+            <if test="accountId != null">
+                AND t1.accountId=#{accountId}
+            </if>
+            <if test="isDel != null">
+                AND t1.isDel=#{isDel}
+            </if>
+            <if test="available != null">
+                AND t1.available=#{available}
+            </if>
+        </where>
+    </select>
+
+    <select id="countSameBankNum" parameterType="com.eveb.saasops.modules.member.entity.MbrBankcard"
+            resultType="java.lang.Integer">
+        select count(1) from mbr_bankcard where id!=#{id}
+        <if test="bankName != null and bankName!=''">
+            AND bankName=#{bankName}
+        </if>
+        <if test="cardNo != null and cardNo!=''">
+            AND cardNo=#{cardNo}
+        </if>
+        <if test="isDel != null">
+            AND isDel=#{isDel}
+        </if>
+        <if test="accountId != null">
+            AND accountId=#{accountId}
+        </if>
+    </select>
+    <update id="updateOffline" parameterType="java.lang.String">
+		update mbr_account set isOnline=0 where loginName=#{loginName} and isOnline=1
+	</update>
+
+    <select id="getAllMbrGroupIds" resultType="integer">
+		SELECT id FROM mbr_group
+	</select>
+    <select id="countGroupMem" resultType="integer">
+		select count(1) from mbr_account where groupId=#{groupId}
+	</select>
+    <select id="findOrder" resultType="com.eveb.saasops.modules.member.entity.MbrBillManage">
+		select *,case when DATE_ADD(createTime,INTERVAL #{minutes} MINUTE)<![CDATA[ <= ]]>NOW() then 1 else 0 end isTimeOut from mbr_bill_manage where orderNo=#{orderNo} and status=0
+	</select>
+    <select id="mbrFundsTotal" resultType="com.eveb.saasops.modules.member.entity.MbrFundTotal"
+            parameterType="com.eveb.saasops.modules.member.entity.MbrAccount">
+        select
+        <if test="columnSets != null and columnSets.size()>0">
+            <foreach item="columnName" collection="columnSets" separator=",">
+                tt.${columnName}
+            </foreach>
+        </if>
+        from (
+        select tb1.*,tb2.*,tb3.*,tb4.*,tb5.*,tb6.* from(select IFNULL(sum(actualArrival),0.00)
+        onlineactualArrivals,IFNULL(sum(depositAmount),0.00) onlinedepositAmounts,count(1) onlinedepositNum from
+        fund_deposit where accountId=#{id} and mark=0 and `status`=1) tb1
+        left join(select IFNULL(sum(actualArrival),0.00) offlineactualArrivals,IFNULL(sum(depositAmount),0.00)
+        offlinedepositAmounts,count(1) offlinedepositNum from fund_deposit where accountId=#{id} and mark=1 and
+        `status`=1)tb2 on 1=1
+        left join (select ifnull(sum(actualArrival),0.00) withdrawactualArrivals,IFNULL(sum(drawingAmount),0.00)
+        withdrawdrawingAmounts,count(1) withDrawNum from fund_acc_withdraw where accountId=#{id} and `status`=1)tb3 on
+        1=1
+        left join (select IFNULL(sum(bonusAmount),0.00) bonusAmounts,count(1) bonusNum from opr_act_bonus where
+        accountId=#{id} AND `status`=1)tb4 on 1=1
+        left join(select count(1) adjustNum from fund_audit where accountId=#{id} and `status`=1)tb5 on 1=1
+        left join(
+        SELECT sum(a)- sum(b) amounts FROM( SELECT IFNULL(sum(amount),0) a,0 b FROM fund_audit WHERE accountId=#{id} and
+        `status`=1 and financialCode='AA'
+        union
+        select 0,IFNULL(sum(amount),0) from fund_audit where accountId=#{id} and `status`=1 and financialCode='AM') tb)
+        tb6 on 1=1
+        )tt
+    </select>
+    <update id="updateTempTable">
+		drop table if EXISTS tempAccountId;
+		create temporary table tempAccountId (accountId int not null);
+	</update>
+    <insert id="insertBatchTemp">
+        INSERT INTO temp_AccountId(accountId,uuid) VALUES
+        <foreach collection="accountIds" item="id" open="" close="" separator=",">
+            (#{id},#{uuid})
+        </foreach>
+    </insert>
+    <select id="totalMem" resultType="com.eveb.saasops.modules.member.dto.TotalDto">
+		select t1.accountId,IFNULL(t2.totalDeposit,0.00) totalDeposit,IFNULL(t3.totalWithdrawal,0.00) totalWithdrawal,IFNULL(t4.totalBalance,0.00) totalBalance from temp_AccountId  t1
+		left join(select IFNULL(sum(actualArrival),0.00) totalDeposit,fund_deposit.accountId from fund_deposit,temp_AccountId where fund_deposit.accountId=temp_AccountId.accountId and temp_AccountId.accUuid=#{uuid}  and (mark=0 or mark=1) and `status`=1 group by fund_deposit.accountId)t2 on t1.accountId=t2.accountId
+		left join(select ifnull(sum(actualArrival),0.00) totalWithdrawal,fund_acc_withdraw.accountId from fund_acc_withdraw,temp_AccountId where fund_acc_withdraw.accountId=temp_AccountId.accountId and temp_AccountId.accUuid=#{uuid} and `status`=1 GROUP BY fund_acc_withdraw.accountId)t3 on t1.accountId=t3.accountId
+		left join(select tb2.accountId,(balance+balanceOther) totalBalance from (select mbr_wallet.accountId,balance,IFNULL(balanceOther,0)balanceOther  from mbr_wallet left
+		join(select mbr_depot_wallet.accountId bb,mbr_depot_wallet.accountId,sum(balance) balanceOther from mbr_depot_wallet,temp_AccountId where mbr_depot_wallet.accountId=temp_AccountId.accountId  and temp_AccountId.accUuid=#{uuid} group by accountId) tb1 on mbr_wallet.accountId=tb1.accountId)tb2,temp_AccountId tb3
+		where tb2.accountId=tb3.accountId and tb3.accUuid=#{uuid})t4 on t1.accountId=t4.accountId where t1.accUuid=#{uuid}
+	</select>
+    <delete id="delTotalMem">
+		delete from temp_AccountId where accUuid=#{uuid}
+	</delete>
+
+    <select id="selectRiskControlAudit" resultType="java.util.Map"
+            parameterType="com.eveb.saasops.modules.member.entity.MbrAccount">
+        select * from (
+        SELECT 'registerIp',COUNT(*) count,registerIp item FROM log_mbrregister WHERE
+        registerIp = (SELECT registerIp FROM log_mbrregister WHERE accountId=#{id} ORDER BY id DESC LIMIT 1)
+        AND accountId !=#{id} AND registerIp is not null
+        UNION ALL
+        SELECT 'loginIp',COUNT(*) count,loginIp item FROM log_mbrlogin WHERE
+        loginIp = (SELECT loginIp FROM log_mbrlogin WHERE accountId=#{id} ORDER BY id DESC LIMIT 1)
+        AND accountId !=#{id} AND loginIp is not null
+        UNION ALL
+        SELECT 'agent',COUNT(*) count,cagencyId item FROM mbr_account WHERE
+        cagencyId = (SELECT cagencyId FROM mbr_account WHERE id=#{id}) AND id !=#{id}
+        AND cagencyId is not null
+        UNION ALL
+        SELECT 'email',COUNT(*) count,email item FROM mbr_account WHERE
+        email = (SELECT email FROM mbr_account WHERE id=#{id}) AND id !=#{id}
+        AND email is not null
+        UNION ALL
+        SELECT 'qq',COUNT(*) count,qq item FROM mbr_account WHERE
+        qq = (SELECT qq FROM mbr_account WHERE id=#{id}) AND id !=#{id}
+        AND qq is not null
+        )tt
+        <where>
+            <if test="columnSets != null and columnSets.size()>0">
+                tt.registerIp in
+                <foreach collection="columnSets" open="(" close=")" separator="," item="column">
+                    #{column}
+                </foreach>
+            </if>
+        </where>
+    </select>
+
+    <select id="queryAccountBonusReporList" resultType="java.util.Map">
+		SELECT 'deposit',SUM(depositAmount),count(*) count FROM fund_deposit WHERE accountId=#{accountId}  AND status=1
+		UNION ALL
+		SELECT 'withdraw',SUM(drawingAmount),count(*) count FROM fund_acc_withdraw WHERE accountId=#{accountId}  AND status=1
+		UNION ALL
+		SELECT 'bonus',SUM(bonusAmount),count(*) count FROM opr_act_bonus WHERE accountId=#{accountId}  AND status=1
+	</select>
+
+    <select id="queryAccountFundList" resultType="com.eveb.saasops.modules.member.entity.MbrBillDetail">
+		SELECT * FROM
+		(
+			SELECT financialCode,amount,afterBalance,beforeBalance,orderTime,memo,opType,
+			0 depotAfterBalance,0 depotBeforeBalance,
+			(SELECT codeName FROM t_bs_financialcode WHERE code=financialCode) financialCodeName
+			FROM mbr_bill_detail
+			 WHERE accountId=#{accountId} AND financialCode != 'BI' AND financialCode != 'BO'
+			UNION ALL
+			SELECT case opType when 0 then 'BI'when 1 then 'BO' end financialCode,amount,
+			afterBalance,beforeBalance,createTime orderTime,memo,opType,
+			depotAfterBalance,depotBeforeBalance,
+			(SELECT codeName FROM t_bs_financialcode WHERE code=financialCode) financialCodeName
+			FROM mbr_bill_manage WHERE accountId = #{accountId}
+		) t ORDER BY orderTime DESC
+	</select>
+
+    <select id="queryAccountAuditInfo" resultType="com.eveb.saasops.modules.member.dto.ItemDto">
+        SELECT * FROM
+        (
+        <if test="keys =='registerIp'">
+            SELECT registerIp item,loginName FROM log_mbrregister WHERE registerIp=#{item} AND accountId !=#{accountId}
+        </if>
+        <if test="keys =='loginIp'">
+            SELECT loginIp item,loginName FROM log_mbrlogin WHERE loginIp=#{item} AND accountId !=#{accountId}
+        </if>
+        <if test="keys =='agent'">
+            SELECT t.loginName,n.agyAccount item FROM mbr_account t LEFT JOIN agy_account n ON t.cagencyId = n.id
+            WHERE t.id !=#{accountId} AND t.cagencyId =#{item}
+        </if>
+        <if test="keys =='email'">
+            SELECT email item,loginName FROM mbr_account WHERE email=#{item} AND id !=#{accountId}
+        </if>
+        <if test="keys =='qq'">
+            SELECT qq item,loginName FROM mbr_account WHERE qq=#{item} AND id !=#{accountId}
+        </if>
+        ) t
+    </select>
+
+    <select id="queryAccountMemoList" resultType="com.eveb.saasops.modules.member.entity.MbrMemo"
+            parameterType="com.eveb.saasops.modules.member.entity.MbrMemo">
+        SELECT mo.*,re.role_name roleName FROM mbr_memo mo LEFT JOIN sys_role re ON mo.roleId = re.role_id
+        <where>
+            <if test="accountId != null">
+                AND mo.accountId=#{accountId}
+            </if>
+        </where>
+        ORDER BY memoTime desc LIMIT 3
+    </select>
+
+    <select id="queryAccountSortMemo" resultType="com.eveb.saasops.modules.member.entity.MbrMemo">
+        SELECT re.role_name roleName,mo.roleId FROM mbr_memo mo
+        LEFT JOIN sys_role re ON mo.roleId = re.role_id
+        WHERE mo.roleId IS NOT NULL AND mo.accountId = #{accountId} GROUP BY mo.roleId
+    </select>
+
+    <select id="findHomePageCount" resultType="java.util.Map">
+        SELECT 'active',count(DISTINCT accountId) count FROM (
+        SELECT DISTINCT accountId  FROM fund_deposit
+        WHERE `status`=1 AND DATE_FORMAT(auditTime, "%Y-%m-%d") =#{startday}
+        UNION ALL
+        SELECT accountId  FROM fund_acc_withdraw
+        WHERE `status`=1 AND DATE_FORMAT(passTime, "%Y-%m-%d") =#{startday}
+        UNION ALL
+        SELECT  DISTINCT account.id accountId FROM rpt_bet_rcd_day ry
+        INNER JOIN mbr_account account ON ry.username=account.loginName
+        WHERE ry.startday =#{startday}
+        ) a
+        UNION ALL
+        SELECT 'register',count(*) FROM mbr_account
+        WHERE DATE_FORMAT(registerTime, "%Y-%m-%d") =#{startday}
+        UNION ALL
+        SELECT 'login',count(DISTINCT accountId) FROM log_mbrlogin
+        WHERE DATE_FORMAT(loginTime, "%Y-%m-%d") =#{startday}
+        UNION ALL
+        SELECT 'depositCount',count(DISTINCT accountId) FROM fund_deposit
+        WHERE `status`=1 AND DATE_FORMAT(auditTime, "%Y-%m-%d") =#{startday}
+        UNION ALL
+        SELECT 'depositSum',IFNULL(sum(depositAmount),0) FROM fund_deposit
+        WHERE `status`=1 AND DATE_FORMAT(auditTime, "%Y-%m-%d") =#{startday}
+        UNION ALL
+        SELECT 'withdrawSum',IFNULL(sum(drawingAmount),0) FROM fund_acc_withdraw
+        WHERE `status`=1 AND DATE_FORMAT(passTime, "%Y-%m-%d") =#{startday}
+    </select>
+</mapper>

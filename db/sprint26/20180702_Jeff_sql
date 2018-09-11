@@ -1,0 +1,4 @@
+-- 广告管理添加广告子类型，添加排序序号
+ALTER TABLE `opr_adv`
+  ADD COLUMN `advTypeChild` INT(11) DEFAULT 0  NULL COMMENT '广告子类型(0：空值，1：首页，2：真人，3：电子，4：体育，5：彩票)' AFTER `outStation`,
+  ADD COLUMN `advTypeChildNum` INT(11) DEFAULT 1  NULL   COMMENT '广告子类型序号' AFTER `advTypeChild`;

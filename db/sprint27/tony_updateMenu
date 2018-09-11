@@ -1,0 +1,2 @@
+-- 将系统管理修改成系统设置
+update sys_menu a set a.name='系统设置' where a.name='系统管理' and a.parent_id=59;

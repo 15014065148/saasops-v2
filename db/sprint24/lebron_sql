@@ -1,0 +1,2 @@
+alter table sys_menu add columnName varchar(24) comment '字段名';
+alter table sys_menu add operate int(2) comment '操作类型1:新增2:修改3：删除';

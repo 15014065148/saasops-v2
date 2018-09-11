@@ -1,0 +1,172 @@
+alter table sys_menu add column columnKey varchar(50) DEFAULT NULL COMMENT '字段名' after columnName;
+
+-- 会员入款菜单顺序调整
+update sys_menu set order_num=3 where menu_id=838; -- 调整会员入款菜单的顺序
+update sys_menu set order_num=5 where menu_id=147; -- 调整会员提款菜单的顺序
+update sys_menu set order_num=6 where menu_id=209; -- 调整资金调整菜单的顺序
+update sys_menu set order_num=7 where menu_id=198; -- 调整户内转账菜单的顺序
+
+update sys_menu set perms='member:mbraccount:agentUpdate' where menu_id=807;
+delete from sys_menu where menu_id=223;
+
+update sys_menu set perms='member:mbraccount:avlUpdate' where menu_id=804;
+delete from sys_menu where menu_id=225;
+
+update sys_menu set perms='member:mbrmemo:list,member:mbrmemo:info' where menu_id=725;
+delete from sys_menu where menu_id=138;
+
+update sys_role_menu set menu_id=807 where menu_id=223;
+update sys_role_menu set menu_id=804 where menu_id=225;
+update sys_role_menu set menu_id=725 where menu_id=138;
+
+delete from sys_menu where menu_id=222;
+delete from sys_role_menu where menu_id=222;
+
+INSERT INTO `sys_menu`(`menu_id`, `parent_id`, `name`, `url`, `perms`, `type`, `icon`, `order_num`, `columnName`, `columnKey`, `operate`) VALUES (857, 725, '最新备注-新增', NULL, 'member:mbrmemo:save', 3, NULL, 0, NULL, NULL, 1);
+INSERT INTO `sys_menu`(`menu_id`, `parent_id`, `name`, `url`, `perms`, `type`, `icon`, `order_num`, `columnName`, `columnKey`, `operate`) VALUES (847, 725, '最新备注-修改', NULL, 'member:mbrmemo:update', 3, NULL, 0, NULL, NULL, 2);
+INSERT INTO `sys_menu`(`menu_id`, `parent_id`, `name`, `url`, `perms`, `type`, `icon`, `order_num`, `columnName`, `columnKey`, `operate`) VALUES (848, 725, '最新备注-删除', NULL, 'member:mbrmemo:delete', 3, NULL, 0, NULL, NULL, 3);
+INSERT INTO `sys_role_menu`(`role_id`, `menu_id`, `isTotalChecked`) VALUES (1, 857, 1);
+INSERT INTO `sys_role_menu`(`role_id`, `menu_id`, `isTotalChecked`) VALUES (1, 847, 1);
+INSERT INTO `sys_role_menu`(`role_id`, `menu_id`, `isTotalChecked`) VALUES (1, 848, 1);
+
+delete from sys_menu where menu_id in (139, 140, 141);
+
+delete from sys_menu where menu_id in (54, 520, 690);
+
+
+delete from sys_menu where menu_id=696;
+delete from sys_role_menu where menu_id=696;
+INSERT INTO `sys_menu`(`menu_id`, `parent_id`, `name`, `url`, `perms`, `type`, `icon`, `order_num`, `columnName`, `columnKey`, `operate`) VALUES (849, 706, '会员帐号-完整联系方式', NULL, 'member:mbraccount:contact', 3, NULL, 0, NULL, 'memberFullRelationKey', NULL);
+INSERT INTO `sys_role_menu`(`role_id`, `menu_id`, `isTotalChecked`) VALUES (1, 849, 1);
+
+delete from sys_menu where menu_id in (299, 300, 301);
+delete from sys_role_menu where menu_id in (299, 300, 301);
+
+delete from sys_menu where menu_id in (143, 144, 145, 146);
+delete from sys_role_menu where menu_id in (143, 144, 145, 146);
+
+delete from sys_menu where menu_id=110;
+delete from sys_role_menu where menu_id=110;
+
+delete from sys_menu where menu_id in (802, 803);
+
+
+INSERT INTO `sys_menu`(`menu_id`, `parent_id`, `name`, `url`, `perms`, `type`, `icon`, `order_num`, `columnName`, `columnKey`, `operate`) VALUES (852, 849, '电话', NULL, 'member:mbraccount:contact:mobile', 3, NULL, 0, NULL, 'fullRelationMobile', NULL);
+INSERT INTO `sys_menu`(`menu_id`, `parent_id`, `name`, `url`, `perms`, `type`, `icon`, `order_num`, `columnName`, `columnKey`, `operate`) VALUES (853, 849, '邮箱', NULL, 'member:mbraccount:contact:email', 3, NULL, 0, NULL, 'fullRelationEmail', NULL);
+INSERT INTO `sys_menu`(`menu_id`, `parent_id`, `name`, `url`, `perms`, `type`, `icon`, `order_num`, `columnName`, `columnKey`, `operate`) VALUES (854, 849, '微信', NULL, 'member:mbraccount:contact:wechat', 3, NULL, 0, NULL, 'fullRelationWechat', NULL);
+INSERT INTO `sys_menu`(`menu_id`, `parent_id`, `name`, `url`, `perms`, `type`, `icon`, `order_num`, `columnName`, `columnKey`, `operate`) VALUES (855, 849, 'QQ', NULL, 'member:mbraccount:contact:qq', 3, NULL, 0, NULL, 'fullRelationQq', NULL);
+INSERT INTO `sys_role_menu`(`role_id`, `menu_id`, `isTotalChecked`) VALUES (1, 852, 1);
+INSERT INTO `sys_role_menu`(`role_id`, `menu_id`, `isTotalChecked`) VALUES (1, 853, 1);
+INSERT INTO `sys_role_menu`(`role_id`, `menu_id`, `isTotalChecked`) VALUES (1, 854, 1);
+INSERT INTO `sys_role_menu`(`role_id`, `menu_id`, `isTotalChecked`) VALUES (1, 855, 1);
+
+update sys_menu set perms='member:mbraccount:update' where menu_id in (795, 796, 799, 800, 801, 806, 807);
+update sys_menu set perms='member:mbraccount:update,member:mbraccount:avlUpdate' where menu_id=804;
+update sys_menu set perms='member:mbraccount:update,member:mbraccount:groupIdUpdate' where menu_id=805;
+
+delete from sys_menu where menu_id=109;
+delete from sys_role_menu where menu_id=109;
+
+update sys_menu set perms='member:mbraccount:list,member:mbraccount:info' where menu_id=106;
+
+
+INSERT INTO `sys_menu`(`menu_id`, `parent_id`, `name`, `url`, `perms`, `type`, `icon`, `order_num`, `columnName`, `columnKey`, `operate`) VALUES (858, 842, '查看', NULL, 'fund:onLine:list,setting:sysdeposit:list,fund:onLine:info', 2, NULL, 0, NULL, NULL, NULL);
+INSERT INTO `sys_role_menu`(`role_id`, `menu_id`, `isTotalChecked`) VALUES (1, 858, 1);
+
+
+INSERT INTO `sys_menu`(`menu_id`, `parent_id`, `name`, `url`, `perms`, `type`, `icon`, `order_num`, `columnName`, `columnKey`, `operate`) VALUES (846, 0, '支付配置', NULL, NULL, 0, 'iconfont icon-activityManage', 12, NULL, NULL, NULL);
+INSERT INTO `sys_role_menu`(`role_id`, `menu_id`, `isTotalChecked`) VALUES (1, 846, 1);
+update sys_menu set parent_id=846 where menu_id = 192;
+update sys_menu set parent_id=846 where menu_id = 215;
+update sys_menu set parent_id=846 where menu_id = 691;
+
+update sys_menu set perms='member:audit:list' where menu_id = 775;
+
+update sys_menu set perms='member:audit:list' where menu_id = 775;
+update sys_menu set perms='member:mbrwallet:list,member:mbrwallet:info' where menu_id = 743;
+delete from sys_menu where menu_id in (850,851);
+
+
+
+
+
+update sys_menu set columnKey='loginNameKey' where menu_id = 731;
+update sys_menu set columnKey='realNameKey' where menu_id = 732;
+update sys_menu set columnKey='mobileKey' where menu_id = 733;
+update sys_menu set columnKey='bankCardKey' where menu_id = 734;
+update sys_menu set columnKey='emailKey' where menu_id = 735;
+update sys_menu set columnKey='weChatKey' where menu_id = 736;
+update sys_menu set columnKey='qqKey' where menu_id = 737;
+update sys_menu set columnKey='registerTimeKey' where menu_id = 738;
+update sys_menu set columnKey='registerIpKey' where menu_id = 739;
+update sys_menu set columnKey='registerUrlKey' where menu_id = 740;
+update sys_menu set columnKey='loginTimeKey' where menu_id = 741;
+update sys_menu set columnKey='loginIpKey' where menu_id = 742;
+update sys_menu set columnKey='onlinedepositNumKey' where menu_id = 762;
+update sys_menu set columnKey='onlinedepositAmountsKey' where menu_id = 763;
+update sys_menu set columnKey='offlinedepositNumKey' where menu_id = 764;
+update sys_menu set columnKey='offlinedepositAmountsKey' where menu_id = 765;
+update sys_menu set columnKey='withDrawNumKey' where menu_id = 766;
+update sys_menu set columnKey='withdrawdrawingAmountsKey' where menu_id = 767;
+update sys_menu set columnKey='bonusNumKey' where menu_id = 768;
+update sys_menu set columnKey='bonusAmountsKey' where menu_id = 769;
+update sys_menu set columnKey='adjustNumKey' where menu_id = 770;
+update sys_menu set columnKey='amountsKey' where menu_id = 771;
+update sys_menu set columnKey='betKey' where menu_id = 772;
+update sys_menu set columnKey='validBetKey' where menu_id = 773;
+update sys_menu set columnKey='payoutKey' where menu_id = 774;
+update sys_menu set columnKey='totalBalanceKey' where menu_id = 743;
+update sys_menu set columnKey='availableKey' where menu_id = 744;
+update sys_menu set columnKey='groupIdKey' where menu_id = 745;
+update sys_menu set columnKey='tagencyIdKey' where menu_id = 746;
+update sys_menu set columnKey='isOnlineKey' where menu_id = 747;
+update sys_menu set columnKey='cagencyIdKey' where menu_id = 748;
+update sys_menu set columnKey='tRegisterIpKey' where menu_id = 749;
+update sys_menu set columnKey='tEmailKey' where menu_id = 750;
+update sys_menu set columnKey='tLoginIpKey' where menu_id = 751;
+update sys_menu set columnKey='tQqKey' where menu_id = 752;
+update sys_menu set columnKey='tAgentKey' where menu_id = 753;
+update sys_menu set columnKey='memberDetailKey' where menu_id = 706;
+update sys_menu set columnKey='addMemberKey' where menu_id = 707;
+update sys_menu set columnKey='memberExportKey' where menu_id = 708;
+update sys_menu set columnKey='memberDataKey' where menu_id = 722;
+update sys_menu set columnKey='memberOtherDataKey' where menu_id = 723;
+update sys_menu set columnKey='memberRiskValidateKey' where menu_id = 724;
+update sys_menu set columnKey='memberNewRemarkKey' where menu_id = 725;
+update sys_menu set columnKey='memberGameManageKey' where menu_id = 726;
+update sys_menu set columnKey='memberAssetInfoKey' where menu_id = 727;
+update sys_menu set columnKey='memberLogKey' where menu_id = 728;
+update sys_menu set columnKey='memberResetLoginPwdKey' where menu_id = 729;
+update sys_menu set columnKey='memberResetWithdrawPwdKey' where menu_id = 730;
+update sys_menu set columnKey='memberSendMessageKey' where menu_id = 808;
+update sys_menu set columnKey='memberManualAddKey' where menu_id = 835;
+update sys_menu set columnKey='memberManualReduceKey' where menu_id = 836;
+update sys_menu set columnKey='actualAuditKey' where menu_id = 775;
+update sys_menu set columnKey='capitalBill' where menu_id = 788;
+update sys_menu set columnKey='transferRecord' where menu_id = 789;
+update sys_menu set columnKey='depositRecord' where menu_id = 790;
+update sys_menu set columnKey='withdrawRecord' where menu_id = 791;
+update sys_menu set columnKey='bonusRecord' where menu_id = 792;
+update sys_menu set columnKey='informationChange' where menu_id = 793;
+update sys_menu set columnKey='loginLog' where menu_id = 794;
+update sys_menu set columnKey='bankCardModify' where menu_id = 797;
+update sys_menu set columnKey='bankCardDelete' where menu_id = 798;
+update sys_menu set columnKey='bankCardAdd' where menu_id = 840;
+update sys_menu set columnKey='realNameModifyKey' where menu_id = 795;
+update sys_menu set columnKey='mobileModifyKey' where menu_id = 796;
+update sys_menu set columnKey='emailModifyKey' where menu_id = 799;
+update sys_menu set columnKey='wechatModifyKey' where menu_id = 800;
+update sys_menu set columnKey='qqModifyKey' where menu_id = 801;
+update sys_menu set columnKey='availableModifyKey' where menu_id = 804;
+update sys_menu set columnKey='groupIdModifyKey' where menu_id = 805;
+update sys_menu set columnKey='tagencyIdModifyKey' where menu_id = 806;
+update sys_menu set columnKey='cagencyIdModifyKey' where menu_id = 807;
+
+
+
+
+
+
+
+
+update sys_menu set columnName='totalBalance' where menu_id=743;

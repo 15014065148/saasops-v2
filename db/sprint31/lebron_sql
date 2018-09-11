@@ -1,0 +1,2 @@
+update sys_menu set name='完整联系方式' where menu_id=849;
+delete from sys_menu where menu_id=708;

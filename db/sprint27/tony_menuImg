@@ -1,0 +1,6 @@
+-- 前台菜单图标
+
+update sys_menu set  icon='iconfont icon-activityManage' where name='市场活动';
+update sys_menu set  icon='iconfont icon-tellManage' where name='公告管理';
+update sys_menu set  icon='iconfont icon-adManege' where NAME='广告管理' and menu_id=845;
+update sys_menu set  icon='iconfont icon-paySet' where name='支付配置';

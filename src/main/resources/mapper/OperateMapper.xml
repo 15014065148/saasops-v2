@@ -1,0 +1,438 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="com.eveb.saasops.modules.operate.mapper.OperateMapper">
+    <select id="selectGameOne" resultType="com.eveb.saasops.modules.operate.entity.TGmGame"
+            parameterType="java.lang.Integer">
+		select t1.*,t2.catName,t3.depotName from t_gm_game
+		t1,t_gm_cat t2,
+		t_gm_depot t3 where t1.catId=t2.id and t1.depotId=
+		t3.id and t3.available=1 and t1.id=#{id}
+	</select>
+    <select id="selectNoticeList"
+            resultType="com.eveb.saasops.modules.operate.entity.OprNotice"
+            parameterType="com.eveb.saasops.modules.operate.entity.OprNotice">
+        select * from opr_notice
+        <include refid="noticeWhere"/>
+    </select>
+
+    <select id="queryNoticeList" resultType="com.eveb.saasops.modules.operate.entity.OprNotice"
+            parameterType="com.eveb.saasops.modules.operate.entity.OprNotice">
+        select * from opr_notice where available=1
+        <if test="showType != null and showType!='' and showType != '2'.toString()">
+            and (showType=#{showType} or showType='2')
+        </if>
+    </select>
+
+    <select id="findCatLabelList" resultType="com.eveb.saasops.modules.operate.entity.TgmCatLabel"
+            parameterType="java.lang.Integer">
+		select * from(select t1.id,catName lableName,1 showType,t1.sortId
+		from t_gm_cat
+		t1,t_gm_depotcat t2 where t1.id=t2.catId and
+		t1.available=1 and
+		parentId=5 and t2.depotId=#{depotId}
+		union
+		select
+		DISTINCT t1.id,t1.labelName,2 showType,t1.sortId from t_gm_label
+		t1,opr_gmlabel t2 where t1.id=t2.labelId and
+		t2.depotId=#{depotId})tb1
+		order by showType ,sortId
+	</select>
+    <select id="findDepotcat" resultType="com.eveb.saasops.modules.operate.entity.TGmDepotcat">
+        SELECT
+        tb1.id,tb1.catId,tb1.catName,tb1.depotId,tb1.depotName,tb2.sortId,tb2.picUrl,tb2.mbPicUrl,tb2.gameTag,
+        tb2.logoPc,tb2.logoMb,tb2.logoApp FROM (SELECT DISTINCT t1.id,t1.logo,t1.gameTag,t1.pcUrlTag,
+        t2.catName,t3.depotName,t1.depotId,t1.catId,t1.recRating,t4.sort FROM t_gm_game t1,t_gm_cat t2,
+        t_gm_depot t3,t_gm_depotcat t4 WHERE t1.catId = t2.id
+        AND t1.depotId = t3.id
+        AND t3.id = t4.depotId
+        AND t2.id = t4.catId
+        AND t2.id IN (1, 3, 12)
+        AND t1.topLink = 1
+        AND t1.catId = #{catId})tb1 left join t_game_logo tb2
+        on tb1.catId=tb2.catId and tb1.depotId=tb2.depotId
+        LEFT JOIN set_gm_game tb3 on tb2.id = tb3.gameLogoId
+        WHERE
+        <if test="terminal==null">
+            tb2.enablePc = 1 and (tb3.enableDepotPc = 1 OR tb3.enableDepotPc is null)
+        </if>
+        <if test="terminal==1">
+            tb2.enableMb = 1 and (tb3.enableDepotMb = 1 OR tb3.enableDepotMb is null)
+        </if>
+        order by tb2.sortId ASC
+    </select>
+
+    <select id="findDepotcatAll" resultType="com.eveb.saasops.modules.operate.entity.TGmDepotcat">
+        select DISTINCT t2.depotName,case when t3.parentId=0 then t3.catName else (select catName
+        from t_gm_cat where id=t3.parentId)  end catName,t1.depotId,case when t3.parentId=0 then
+        t1.catId else parentId end catId from t_gm_depotcat t1,t_gm_depot t2,t_gm_cat t3 where
+        t1.catId=t3.id and t1.depotId=t2.id and t2.available=1 and t3.available=1 order by t2.depotName
+	</select>
+
+    <select id="findCatDepot" resultType="com.eveb.saasops.modules.operate.entity.TGmDepotcat">
+        select t1.depotId,t2.depotName,t3.catName from t_gm_depotcat t1,t_gm_depot t2,t_gm_cat t3 where
+        t1.depotId = t2.id and t2.available = 1 and t1.catId = t3.id
+        <if test="catId != null">
+            and t1.catId = #{catId}
+        </if>
+    </select>
+
+    <select id="findWebGameList" resultType="com.eveb.saasops.modules.operate.entity.OprGame"
+            parameterType="com.eveb.saasops.api.modules.user.dto.ElecGameDto">
+        SELECT t1.id,t1.gameName,t1.logo,t1.logo2,IFNULL(t1.clickNum, 0) clickNum,IFNULL(t1.recRating, 0) recRating,
+        t1.depotName,t3.catName,IFNULL(t1.enablePool, 0) enablePool,IFNULL(t1.enableTest, 0)
+        enableTest,IFNULL(t1.goodNum, 0) goodNum,
+        t1.enablePc,t1.enableMb,t1.enableApp
+        FROM t_gm_game t1
+        LEFT JOIN t_gm_cat t3 ON t1.catId = t3.id
+        LEFT JOIN set_game t4 ON t1.id = t4.gameId
+        <include refid="webGameWhere"/>
+        <choose>
+            <when test="sortMark != null and sortMark == '1'.toString()">
+                order by t1.clickNum ${sortWay}
+            </when>
+            <when test="sortMark != null and sortMark == '2'.toString()">
+                order by t1.goodNum ${sortWay}
+            </when>
+            <otherwise>
+                order by t1.sortId ${sortWay}
+            </otherwise>
+        </choose>
+    </select>
+    <sql id="webGameWhere">
+        <where>
+            t1.catId=5 and t1.available=1
+            <if test="id != null">
+                and t1.subCatId =#{id}
+            </if>
+            <if test="enableTest != null">
+                and t1.enableTest =#{enableTest}
+            </if>
+            <if test="terminal==0">
+                and t1.enablePc=1
+                and (t4.enableGmaePc =1 or t4.enableGmaePc IS NULL)
+            </if>
+            <if test="terminal==1">
+                and t1.enableMb=1
+                and (t4.enableGmaeMb =1 or t4.enableGmaeMb IS NULL)
+            </if>
+            <if test="depotId != null">
+                and t1.depotId =#{depotId}
+            </if>
+            <if test="lableName!= null and lableName!=''">
+                and t1.gameName like concat('%',#{lableName},'%')
+            </if>
+        </where>
+    </sql>
+    <select id="findCatGameList" resultType="com.eveb.saasops.modules.operate.entity.OprGame">
+	select t1.id,t1.gameName,t1.logo,t1.logo2,IFNULL(t1.clickNum,0) clickNum,IFNULL(t1.recRating,0) recRating, t2.depotName,t3.catName,
+	IFNULL(t1.enablePool,0) enablePool,IFNULL(t1.enableTest,0) enableTest,IFNULL(t1.goodNum,0) goodNum from t_gm_game t1,t_gm_depot t2,t_gm_cat t3
+	 where t1.depotId=t2.id and  t1.catId=t3.id   and t1.enablePc=1 and t1.available=1 and  t1.depotId=#{depotId}  and t1.catId=#{catId} and logo2 is not null
+	</select>
+
+    <select id="findlabelGameList" resultType="com.eveb.saasops.modules.operate.entity.OprGame"
+            parameterType="com.eveb.saasops.api.modules.user.dto.ElecGameDto">
+        SELECT
+        t1.id,t1.gameName,t1.logo,t1.logo2,
+        IFNULL(t1.clickNum, 0) clickNum,
+        IFNULL(t1.recRating, 0) recRating,
+        t1.depotName,t4.catName,
+        IFNULL(t1.enablePool, 0) enablePool,
+        IFNULL(t1.enableTest, 0) enableTest,
+        IFNULL(t1.goodNum, 0) goodNum
+        FROM
+        t_gm_game t1 LEFT JOIN
+        opr_gmlabel t2 ON t1.id = t2.gameId LEFT JOIN
+        t_gm_cat t4 ON t1.subCatId = t4.id LEFT JOIN set_game t5 ON t1.id = t5.gameId where
+        t1.catId=5 and t1.enablePc=1 and t1.available=1 and t2.labelId=#{id} and
+        t2.depotId=#{depotId}
+        <if test="enableTest != null">
+            and t1.enableTest =#{enableTest}
+        </if>
+        <if test="terminal==0">
+            and t1.enablePc=1
+            and (t5.enableGmaePc =1 or t5.enableGmaePc IS NULL)
+        </if>
+        <if test="terminal==1">
+            and t1.enableMb=1
+            and (t5.enableGmaeMb =1 or t5.enableGmaeMb IS NULL)
+        </if>
+        <choose>
+            <when test="sortMark != null and sortMark == '1'.toString()">
+                order by t1.clickNum ${sortWay}
+            </when>
+            <when test="sortMark != null and sortMark == '2'.toString()">
+                order by t1.goodNum ${sortWay}
+            </when>
+            <otherwise>
+                order by t1.sortId ${sortWay}
+            </otherwise>
+        </choose>
+    </select>
+
+    <select id="gameAllList" resultType="com.eveb.saasops.modules.operate.dto.DepotListDto">
+        select t1.depotId,t1.logoPc depotLogo,t2.depotName from t_game_logo t1 LEFT JOIN
+        t_gm_depot t2 on t1.depotId = t2.id where depotId in (2,5,6,12,14,22,23) GROUP BY t1.depotId
+    </select>
+
+    <!-- <select id="gameAllList1" resultType="com.eveb.saasops.modules.operate.entity.OprGame">
+        SELECT * FROM t_gm_game a WHERE #{pageNumber} > (SELECT count(*) FROM t_gm_game b WHERE
+        b.depotId = a.depotId AND b.clickNum > a.clickNum) and a.depotId IN (2,5,6,12,14) ORDER BY a.depotId,a.clickNum DESC
+     </select> -->
+
+    <select id="gameAllList1" resultType="com.eveb.saasops.modules.operate.entity.OprGame">
+       (SELECT * FROM t_gm_game where depotId = 2 ORDER BY clickNum DESC LIMIT #{pageNumber})
+        UNION ALL
+        (SELECT * FROM t_gm_game where depotId = 5 ORDER BY clickNum DESC LIMIT #{pageNumber})
+        UNION ALL
+        (SELECT * FROM t_gm_game where depotId = 6 ORDER BY clickNum DESC LIMIT #{pageNumber})
+        UNION ALL
+        (SELECT * FROM t_gm_game where depotId = 12 ORDER BY clickNum DESC LIMIT #{pageNumber})
+        UNION ALL
+        (SELECT * FROM t_gm_game where depotId = 14 ORDER BY clickNum DESC LIMIT #{pageNumber})
+         UNION ALL
+        (SELECT * FROM t_gm_game where depotId = 22 ORDER BY clickNum DESC LIMIT #{pageNumber})
+        UNION ALL
+        (SELECT * FROM t_gm_game where depotId = 23 ORDER BY clickNum DESC LIMIT #{pageNumber})
+    </select>
+
+    <sql id="msgWhere">
+        <where>
+            t1.msgId=t2.id
+            <if test="loginName!= null and loginName!=''">
+                and t1.loginName like concat('%',#{loginName},'%')
+            </if>
+            <if test="title!= null and title!=''">
+                and t2.title like concat('%',#{title},'%')
+            </if>
+
+            <if test="sendTimeStart!= null and sendTimeStart!=''">
+                and t2.sendTime&lt;=#{sendTimeStart}
+            </if>
+            <if test="sendTimeEnd!= null and sendTimeEnd!=''">
+                and t2.sendTime&gt;=#{sendTimeEnd}
+            </if>
+
+            <if test="receiveType!= null and receiveType!=''">
+                and
+                t2.receiveType =#{receiveType}
+            </if>
+            <if test="state != null">
+                and t2.state =#{state}
+            </if>
+
+            <if test="readTimeStart!= null and readTimeStart!=''">
+                and t2.readTime&gt;=#{createStart}
+            </if>
+            <if test="readTimeEnd!= null and readTimeEnd!=''">
+                and t2.readTime&lt;=#{createEnd}
+            </if>
+        </where>
+    </sql>
+    <sql id="noticeWhere">
+        <where>
+            <if test="noticeTitle != null and noticeTitle!=''">
+                and noticeTitle like concat('%',#{noticeTitle},'%')
+            </if>
+            <if test="showTypes != null and showTypes!='' and showTypes != '2'.toString()">
+                and (showType=#{showTypes} or showType='2')
+            </if>
+            <if test="availables != null and availables.size()>0">
+                and available in
+                <foreach item="available" collection="availables" open="(" separator="," close=")">
+                    #{available}
+                </foreach>
+            </if>
+            <if test="createStart != null and createStart!=''">
+                and createTime&gt;=#{createStart}
+            </if>
+            <if test="createEnd != null and createEnd!=''">
+                and createTime&lt;=#{createEnd}
+            </if>
+        </where>
+    </sql>
+    <sql id="baseWhere">
+        <where>
+            <if test="actTmplId != null">
+                and t4.actTmplId =#{actTmplId}
+            </if>
+            <if test="actCatId != null">
+                and t4.actCatId =#{actCatId}
+            </if>
+            <if test="actName != null and actName!=''">
+                and t4.actName like concat('%',#{actName},'%')
+            </if>
+            <if test="useState != null">
+                and t4.useState =#{useState}
+            </if>
+            <if test="useStart != null and useStart!=''">
+                and t4.useStart&gt;=#{useStart}
+            </if>
+            <if test="useEnd != null and useEnd!=''">
+                and t4.useEnd&lt;=#{useEnd}
+            </if>
+        </where>
+    </sql>
+    <sql id="GameWhere">
+        <where>
+            <if test="depotId != null">
+                and t1.depotId =#{depotId}
+            </if>
+            <if test="catId != null">
+                and t1.catId =#{catId}
+            </if>
+            <if test="gameName != null and gameName''">
+                and t1.gameName like concat('%',#{gameName},'%')
+            </if>
+        </where>
+    </sql>
+
+    <update id="updateGmClickNum" parameterType="java.lang.Integer">
+		update t_gm_game set clickNum=IFNULL(clickNum,0)+1,goodNum=clickNum where id=#{gameId}
+	</update>
+
+    <select id="findelecDepotList" resultType="com.eveb.saasops.modules.operate.entity.TGmDepot">
+        SELECT
+        tb1.*, tb2.picUrl logo,
+        tb2.mbPicUrl
+        FROM
+        (SELECT DISTINCT t1.*, t2.sort FROM t_gm_depot t1
+        LEFT JOIN t_gm_depotcat t2 ON t1.id = t2.depotId
+        LEFT JOIN t_gm_cat t3 ON t2.catId = t3.id
+        WHERE t3.parentId = 5 AND t1.available = 1) tb1
+        LEFT JOIN t_game_logo tb2 ON tb2.catId = 5
+        AND tb1.id = tb2.depotId
+        LEFT JOIN set_gm_game tb3 ON tb2.id = tb3.gameLogoId
+        WHERE
+        <if test="terminal==0">
+            tb2.enablePc=1
+            and (tb3.enableDepotPc =1 or tb3.enableDepotPc IS NULL)
+        </if>
+        <if test="terminal==1">
+            tb2.enableMb=1
+            and (tb3.enableDepotPc =1 or tb3.enableDepotPc IS NULL)
+        </if>
+        GROUP BY tb1.memo
+        ORDER BY tb1.sort ASC
+    </select>
+
+    <select id="queryTGmGameList" resultType="com.eveb.saasops.modules.operate.entity.TGmGame">
+        SELECT
+        gm.id id,
+        gm.gameTag gameTag,
+        gm.enablePc enablePc,
+        gm.enableMb enableMb,
+        gm.enableTest enableTest,
+        gm.monthPer monthPer,
+        gm.lastdayPer lastdayPer,
+        gm.available available,
+        cat.catName catName,
+        dp.depotName depotName,
+        dp.memo memo
+        FROM
+        t_gm_game gm
+        LEFT JOIN
+        t_gm_depot dp
+        ON
+        gm.depotId = dp.id
+        LEFT JOIN
+        t_gm_cat cat
+        ON
+        gm.catId = cat.id
+        <include refid="queryTg"></include>
+    </select>
+
+    <sql id="queryTg">
+        <where>
+            <if test="gameTag!=null and gameTag!=''">
+                AND gm.gameTag=#{gameTag}
+            </if>
+            <if test="depotId!=null and depotId!=''">
+                AND dp.Id = #{depotId}
+            </if>
+            <if test="available!=null">
+                AND gm.available = #{available}
+            </if>
+            <if test="enablePc!=null">
+                AND gm.enablePc = #{enablePc}
+            </if>
+            <if test="enableMb!=null">
+                AND gm.enableMb = #{enableMb}
+            </if>
+            <if test="enableTest!=null">
+                AND gm.enableTest = #{enableTest}
+            </if>
+            <if test="depotName!=null">
+                AND gm.depotName = #{depotName}
+            </if>
+            <if test="catId!= null">
+                AND gm.catId = #{catId}
+            </if>
+        </where>
+    </sql>
+
+    <select id="queryCatList" resultType="com.eveb.saasops.modules.operate.entity.TGmCat">
+        select
+        cat.id id,
+        cat.catName catName,
+        count(gm.id) gameCount,
+        SUM(gm.monthPer) tMonthPer,
+        SUM(gm.lastdayPer) tLastDayPer
+        from
+        t_gm_game gm,
+        t_gm_cat cat,
+        t_gm_depot depot
+        <include refid="queryCat"/>
+        GROUP BY gm.catId
+    </select>
+
+    <sql id="queryCat">
+        <where>
+            cat.id = gm.catId
+            AND
+            depot.id = gm.depotId
+            <if test="id!=null">
+                AND depot.id = #{id}
+            </if>
+            <if test="available!=null">
+                AND depot.available=#{available}
+            </if>
+        </where>
+    </sql>
+
+    <select id="findcatDepotList" resultType="com.eveb.saasops.modules.operate.entity.TGmDepotcat">
+		select * from (select DISTINCT depotName,case  when parentId!=0 then  parentId else catId end catId,t2.depotId  from t_gm_depot t1,t_gm_depotcat t2,
+		t_gm_cat t3 where t1.id=t2.depotId and t2.catId=t3.id and t1.available=1 and t3.available=1)tb1 where catId=#{catId} order by depotId
+	</select>
+    <select id="findWebActList" resultType="com.eveb.saasops.modules.operate.entity.OprActActivity">
+		select * from opr_act_activity where showstart&lt;=now() and showEnd&gt;=now() and available=1 and enablePc=1
+	</select>
+    <select id="findDepotBalanceList" resultType="com.eveb.saasops.modules.operate.entity.TGmDepot">
+		select tb1.* ,tb2.accountId,case when tb2.accountId is null then 0 else 1 end
+		hasAccount from t_gm_depot tb1 inner join mbr_depot_wallet tb2 on
+		tb1.id=tb2.depotId where tb2.accountId=#{accountId} and tb1.available=1
+		order by tb1.sortId asc
+	</select>
+    <select id="findDepotList" resultType="com.eveb.saasops.modules.operate.entity.TGmDepot">
+        SELECT
+        tb1.* ,tb2.accountId,case when tb2.accountId is null then 0 else 1 end hasAccount, GROUP_CONCAT(tb4.catName)
+        catNames
+        FROM t_gm_depot tb1
+        LEFT JOIN mbr_depot_wallet tb2 ON tb1.id = tb2.depotId AND tb2.accountId =#{accountId}
+        LEFT JOIN t_gm_depotcat tb3 ON tb1.id = tb3.depotId
+        LEFT JOIN t_gm_cat tb4 ON tb3.catId = tb4.id
+        LEFT JOIN t_game_logo tb5 ON tb4.id = tb5.catId and tb1.id = tb5.depotId
+        LEFT JOIN set_gm_game tb6 ON tb5.depotId = tb6.depotId and tb5.id = tb6.gameLogoId
+        where tb1.available=1 and tb4.parentId=0
+        <if test="terminal==0">
+            and tb5.enablePc=1
+            and (tb6.enableDepotPc =1 or tb6.enableDepotPc IS NULL)
+        </if>
+        <if test="terminal==1">
+            and tb5.enableMb=1
+            and (tb6.enableDepotPc =1 or tb6.enableDepotPc IS NULL)
+        </if>
+        GROUP BY tb1.id
+        ORDER BY tb1.sortId ASC;
+    </select>
+</mapper>

@@ -1,0 +1,1 @@
+alter table mbr_bankcard add column  bankCardId  int(11) DEFAULT NULL COMMENT '银行卡ID' after accountId;

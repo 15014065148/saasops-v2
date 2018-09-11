@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper
+        namespace="com.eveb.saasops.modules.system.cmpydeposit.dao.SysDepositMapper">
+
+    <select id="querySysDepositList"
+            resultType="com.eveb.saasops.modules.system.cmpydeposit.entity.SysDeposit"
+            parameterType="com.eveb.saasops.modules.system.cmpydeposit.entity.SysDeposit">
+        SELECT
+        ( SELECT count(1) FROM set_basic_sys_dep_mbr d WHERE d.depositId = s.id) mbrGrdNum,
+        ( SELECT count(1) FROM fund_deposit f WHERE f.companyPayId = s.id and f.isPayment = 1 ) depositTimes,
+        ( SELECT IFNULL(SUM(f.depositAmount),0) FROM fund_deposit f WHERE f.companyPayId = s.id AND TO_DAYS(f.auditTime)
+        = TO_DAYS(NOW()) and f.isPayment = 1 ) dayDepAmt,
+        s.* FROM set_basic_sys_deposit s
+        <include refid="query_where"></include>
+    </select>
+
+    <sql id="query_where">
+        <where>
+            <if test="bankTypes != null and bankTypes.size()>0">
+                and s.bankType in
+                <foreach item="bankType" collection="bankTypes" open="(" separator="," close=")">
+                    #{bankType}
+                </foreach>
+            </if>
+            <if test="depositTypeList != null and depositTypeList.size()>0">
+                and s.depositType in
+                <foreach item="depositType" collection="depositTypeList" open="(" separator="," close=")">
+                    #{depositType}
+                </foreach>
+            </if>
+            <if test="bankNameList != null and bankNameList.size()>0">
+                and s.bankName in
+                <foreach item="bankName" collection="bankNameList" open="(" separator="," close=")">
+                    #{bankName}
+                </foreach>
+            </if>
+            <if test=" devSource != null and devSource != ''">
+                and s.devSource LIKE CONCAT('%',#{devSource}, '%')
+            </if>
+        </where>
+    </sql>
+
+</mapper>

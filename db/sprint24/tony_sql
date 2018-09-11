@@ -1,0 +1,185 @@
+-- “调整报表”修改成“资金调整”
+update sys_menu set name='资金调整' where name='调整报表';
+-- “转账报表”修改成“户内转账”
+update sys_menu set name='户内转账' where name='转账报表';
+-- “经营分析”修改成“记录报表”
+update sys_menu set name='记录报表' where name='经营分析';
+-- “游戏数据”修改成“游戏数据报表”
+update sys_menu set name='游戏数据报表' where name='游戏数据';
+
+-- 修改会员绑定银行卡关联字段,手动对历史数据进行更新插入
+update mbr_bankcard set bankCardId=1 where id=1 ;
+update mbr_bankcard set bankCardId=1 where id=2 ;
+update mbr_bankcard set bankCardId=1 where id=3 ;
+update mbr_bankcard set bankCardId=1 where id=4 ;
+update mbr_bankcard set bankCardId=1 where id=5 ;
+update mbr_bankcard set bankCardId=1 where id=6 ;
+update mbr_bankcard set bankCardId=15 where id=7 ;
+update mbr_bankcard set bankCardId=1 where id=8 ;
+update mbr_bankcard set bankCardId=6 where id=9 ;
+update mbr_bankcard set bankCardId=1 where id=10 ;
+update mbr_bankcard set bankCardId=1 where id=11 ;
+update mbr_bankcard set bankCardId=6 where id=12 ;
+update mbr_bankcard set bankCardId=8 where id=13 ;
+update mbr_bankcard set bankCardId=4 where id=14 ;
+update mbr_bankcard set bankCardId=11 where id=15 ;
+update mbr_bankcard set bankCardId=1 where id=16 ;
+update mbr_bankcard set bankCardId=1 where id=17 ;
+update mbr_bankcard set bankCardId=1 where id=18 ;
+update mbr_bankcard set bankCardId=1 where id=19 ;
+update mbr_bankcard set bankCardId=1 where id=20 ;
+update mbr_bankcard set bankCardId=1 where id=21 ;
+update mbr_bankcard set bankCardId=1 where id=22 ;
+update mbr_bankcard set bankCardId=1 where id=23 ;
+update mbr_bankcard set bankCardId=1 where id=24 ;
+update mbr_bankcard set bankCardId=1 where id=25 ;
+update mbr_bankcard set bankCardId=1 where id=26 ;
+update mbr_bankcard set bankCardId=1 where id=27 ;
+update mbr_bankcard set bankCardId=1 where id=28 ;
+update mbr_bankcard set bankCardId=1 where id=29 ;
+update mbr_bankcard set bankCardId=1 where id=30 ;
+update mbr_bankcard set bankCardId=1 where id=31 ;
+update mbr_bankcard set bankCardId=1 where id=32 ;
+update mbr_bankcard set bankCardId=3 where id=33 ;
+update mbr_bankcard set bankCardId=1 where id=34 ;
+update mbr_bankcard set bankCardId=1 where id=35 ;
+update mbr_bankcard set bankCardId=1 where id=36 ;
+update mbr_bankcard set bankCardId=1 where id=37 ;
+update mbr_bankcard set bankCardId=1 where id=38 ;
+update mbr_bankcard set bankCardId=1 where id=39 ;
+update mbr_bankcard set bankCardId=1 where id=40 ;
+update mbr_bankcard set bankCardId=1 where id=41 ;
+update mbr_bankcard set bankCardId=1 where id=42 ;
+update mbr_bankcard set bankCardId=1 where id=43 ;
+update mbr_bankcard set bankCardId=1 where id=44 ;
+update mbr_bankcard set bankCardId=1 where id=45 ;
+update mbr_bankcard set bankCardId=1 where id=46 ;
+update mbr_bankcard set bankCardId=1 where id=47 ;
+update mbr_bankcard set bankCardId=1 where id=48 ;
+update mbr_bankcard set bankCardId=1 where id=49 ;
+update mbr_bankcard set bankCardId=1 where id=50 ;
+update mbr_bankcard set bankCardId=1 where id=51 ;
+update mbr_bankcard set bankCardId=1 where id=52 ;
+update mbr_bankcard set bankCardId=6 where id=53 ;
+update mbr_bankcard set bankCardId=1 where id=54 ;
+update mbr_bankcard set bankCardId=1 where id=55 ;
+update mbr_bankcard set bankCardId=4 where id=56 ;
+update mbr_bankcard set bankCardId=4 where id=57 ;
+update mbr_bankcard set bankCardId=3 where id=58 ;
+update mbr_bankcard set bankCardId=9 where id=59 ;
+update mbr_bankcard set bankCardId=1 where id=60 ;
+update mbr_bankcard set bankCardId=1 where id=61 ;
+update mbr_bankcard set bankCardId=1 where id=62 ;
+update mbr_bankcard set bankCardId=1 where id=63 ;
+update mbr_bankcard set bankCardId=1 where id=64 ;
+update mbr_bankcard set bankCardId=3 where id=65 ;
+update mbr_bankcard set bankCardId=1 where id=66 ;
+update mbr_bankcard set bankCardId=1 where id=67 ;
+update mbr_bankcard set bankCardId=1 where id=68 ;
+update mbr_bankcard set bankCardId=9 where id=69 ;
+update mbr_bankcard set bankCardId=17 where id=70 ;
+update mbr_bankcard set bankCardId=1 where id=71 ;
+update mbr_bankcard set bankCardId=1 where id=72 ;
+update mbr_bankcard set bankCardId=8 where id=73 ;
+update mbr_bankcard set bankCardId=3 where id=74 ;
+update mbr_bankcard set bankCardId=4 where id=75 ;
+update mbr_bankcard set bankCardId=1 where id=76 ;
+update mbr_bankcard set bankCardId=1 where id=77 ;
+update mbr_bankcard set bankCardId=1 where id=78 ;
+update mbr_bankcard set bankCardId=1 where id=79 ;
+update mbr_bankcard set bankCardId=1 where id=80 ;
+update mbr_bankcard set bankCardId=1 where id=81 ;
+update mbr_bankcard set bankCardId=1 where id=82 ;
+update mbr_bankcard set bankCardId=1 where id=83 ;
+update mbr_bankcard set bankCardId=1 where id=84 ;
+update mbr_bankcard set bankCardId=1 where id=85 ;
+update mbr_bankcard set bankCardId=1 where id=86 ;
+update mbr_bankcard set bankCardId=1 where id=87 ;
+update mbr_bankcard set bankCardId=1 where id=88 ;
+update mbr_bankcard set bankCardId=6 where id=89 ;
+update mbr_bankcard set bankCardId=8 where id=90 ;
+update mbr_bankcard set bankCardId=12 where id=91 ;
+update mbr_bankcard set bankCardId=1 where id=92 ;
+update mbr_bankcard set bankCardId=1 where id=93 ;
+update mbr_bankcard set bankCardId=1 where id=94 ;
+update mbr_bankcard set bankCardId=1 where id=95 ;
+update mbr_bankcard set bankCardId=1 where id=96 ;
+update mbr_bankcard set bankCardId=1 where id=97 ;
+update mbr_bankcard set bankCardId=1 where id=98 ;
+update mbr_bankcard set bankCardId=6 where id=99 ;
+update mbr_bankcard set bankCardId=3 where id=100 ;
+update mbr_bankcard set bankCardId=1 where id=101 ;
+update mbr_bankcard set bankCardId=1 where id=102 ;
+update mbr_bankcard set bankCardId=3 where id=103 ;
+update mbr_bankcard set bankCardId=1 where id=104 ;
+update mbr_bankcard set bankCardId=1 where id=105 ;
+update mbr_bankcard set bankCardId=1 where id=106 ;
+update mbr_bankcard set bankCardId=10 where id=107 ;
+update mbr_bankcard set bankCardId=1 where id=108 ;
+update mbr_bankcard set bankCardId=1 where id=109 ;
+update mbr_bankcard set bankCardId=1 where id=110 ;
+update mbr_bankcard set bankCardId=1 where id=111 ;
+update mbr_bankcard set bankCardId=1 where id=112 ;
+update mbr_bankcard set bankCardId=29 where id=113 ;
+update mbr_bankcard set bankCardId=3 where id=114 ;
+update mbr_bankcard set bankCardId=5 where id=115 ;
+update mbr_bankcard set bankCardId=6 where id=116 ;
+update mbr_bankcard set bankCardId=5 where id=117 ;
+update mbr_bankcard set bankCardId=6 where id=118 ;
+update mbr_bankcard set bankCardId=3 where id=119 ;
+update mbr_bankcard set bankCardId=1 where id=120 ;
+update mbr_bankcard set bankCardId=3 where id=121 ;
+update mbr_bankcard set bankCardId=1 where id=122 ;
+update mbr_bankcard set bankCardId=1 where id=123 ;
+update mbr_bankcard set bankCardId=1 where id=124 ;
+update mbr_bankcard set bankCardId=1 where id=125 ;
+update mbr_bankcard set bankCardId=1 where id=126 ;
+update mbr_bankcard set bankCardId=1 where id=127 ;
+update mbr_bankcard set bankCardId=1 where id=128 ;
+update mbr_bankcard set bankCardId=1 where id=129 ;
+
+-- 账变流水菜单添加
+insert into sys_menu (parent_id,name,url,type,order_num) values(55,'账变流水','/main/operateAnalyze/balanceRecord',1,10);
+insert into sys_role_menu (role_id,menu_id,isTotalChecked) select 1,menu_id,1 from sys_menu where name='账变流水';
+insert into sys_role_menu (role_id,menu_id,isTotalChecked) select 4,menu_id,1 from sys_menu where name='账变流水';
+
+-- 会员入款菜单增加，线上入款，公司入款菜单屏蔽
+insert into sys_menu (parent_id,name,url,type,order_num) values(53,'会员入款','/main/wageManage/vipPay',1,7);
+insert into sys_role_menu (role_id,menu_id,isTotalChecked) select 1,menu_id,1 from sys_menu where name='会员入款';
+insert into sys_role_menu (role_id,menu_id,isTotalChecked) select 4,menu_id,1 from sys_menu where name='会员入款';
+delete from sys_role_menu where menu_id in (70,102);
+
+-- 市场活动
+insert into sys_menu (parent_id,name,type,icon,order_num) values(0,'市场活动',0,'iconfont icon-activityManage',9);
+update sys_menu set parent_id=(SELECT * FROM (SELECT menu_id FROM sys_menu where name='市场活动' and type =0) a),order_num=1 WHERE name = '活动设置' and type=1;
+update sys_menu set parent_id=(SELECT * FROM (SELECT menu_id FROM sys_menu where name='市场活动' and type =0) a),order_num=2 WHERE name = '红利列表' and type=1;
+
+-- 公告管理
+insert into sys_menu (parent_id,name,type,icon,order_num) values(0,'公告管理',0,'iconfont icon-activityManage',10);
+update sys_menu set parent_id=(SELECT * FROM (SELECT menu_id FROM sys_menu where name='公告管理' and type =0) a),order_num=1 WHERE name = '信息模板' and type=1;
+update sys_menu set parent_id=(SELECT * FROM (SELECT menu_id FROM sys_menu where name='公告管理' and type =0) a),order_num=2 WHERE name = '公告通知' and type=1;
+update sys_menu set parent_id=(SELECT * FROM (SELECT menu_id FROM sys_menu where name='公告管理' and type =0) a),order_num=3 WHERE name = '站内信' and type=1;
+
+-- 广告管理
+insert into sys_menu (parent_id,name,type,icon,order_num) values(0,'广告管理',0,'iconfont icon-activityManage',11);
+update sys_menu set parent_id=(SELECT * FROM (SELECT menu_id FROM sys_menu where name='广告管理' and type =0) a),order_num=1 WHERE name = '广告管理' and type=1;
+
+-- 支付配置
+insert into sys_menu (parent_id,name,type,icon,order_num) values(0,'支付配置',0,'iconfont icon-activityManage',12);
+update sys_menu set parent_id=(SELECT * FROM (SELECT menu_id FROM sys_menu where name='支付配置' and type =0) a),order_num=1 WHERE name = '线上支付' and type=1;
+update sys_menu set parent_id=(SELECT * FROM (SELECT menu_id FROM sys_menu where name='支付配置' and type =0) a),order_num=2 WHERE name = '入款管理' and type=1;
+update sys_menu set parent_id=(SELECT * FROM (SELECT menu_id FROM sys_menu where name='支付配置' and type =0) a),order_num=3 WHERE name = '出款管理' and type=1;
+
+-- 关系增加/减少
+insert into sys_role_menu (role_id,menu_id,isTotalChecked) select 1,menu_id,1 from sys_menu where name='市场活动' and type =0;
+insert into sys_role_menu (role_id,menu_id,isTotalChecked) select 4,menu_id,1 from sys_menu where name='市场活动' and type =0;
+insert into sys_role_menu (role_id,menu_id,isTotalChecked) select 1,menu_id,1 from sys_menu where name='公告管理' and type =0;
+insert into sys_role_menu (role_id,menu_id,isTotalChecked) select 4,menu_id,1 from sys_menu where name='公告管理' and type =0;
+insert into sys_role_menu (role_id,menu_id,isTotalChecked) select 1,menu_id,1 from sys_menu where name='广告管理' and type =0;
+insert into sys_role_menu (role_id,menu_id,isTotalChecked) select 4,menu_id,1 from sys_menu where name='广告管理' and type =0;
+insert into sys_role_menu (role_id,menu_id,isTotalChecked) select 1,menu_id,1 from sys_menu where name='支付配置' and type =0;
+insert into sys_role_menu (role_id,menu_id,isTotalChecked) select 4,menu_id,1 from sys_menu where name='支付配置' and type =0;
+delete from sys_role_menu where menu_id in (54);
+DELETE FROM sys_role_menu WHERE menu_id  = 302;
+delete from sys_menu where menu_id=302;
+update sys_menu set order_num=13 where menu_id=1;

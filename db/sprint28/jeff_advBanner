@@ -1,0 +1,199 @@
+CREATE TABLE `t_opt_adv_banner` (
+  `id` INT(11) NOT NULL AUTO_INCREMENT COMMENT '主键id',
+  `evebNum` INT(11) DEFAULT NULL COMMENT '模板Id, 1-12值',
+  `clientShow` INT(11) DEFAULT NULL COMMENT '展示客户端（0：pc，1：移动，2：移动pc均显示）',
+  `advType` INT(11) DEFAULT NULL COMMENT '广告类型: 1：首页，2：真人，3：电子，4：体育，5：彩票，6： 手机',
+  `picPcPath` VARCHAR(256) DEFAULT NULL COMMENT 'pc广告路径',
+  `picMbPath` VARCHAR(256) DEFAULT NULL COMMENT '移动广告路径',
+  PRIMARY KEY (`id`)
+) ENGINE=INNODB AUTO_INCREMENT=87 DEFAULT CHARSET=utf8 COMMENT='banner表';
+
+
+
+/**模板 首页**/
+INSERT INTO t_opt_adv_banner (evebNum,clientShow,advType,picPcPath,picMbPath) VALUES(1,2,1,'http://img-ybh.oduosa.com/Fj4HxZLOhsVljosoExOxeJA4m-Uj','http://img-ybh.oduosa.com/Fj4HxZLOhsVljosoExOxeJA4m-Uj'); /* 1.jpg*/
+INSERT INTO t_opt_adv_banner (evebNum,clientShow,advType,picPcPath,picMbPath) VALUES(10,2,1,'http://img-ybh.oduosa.com/Fj05t-VXpjhoH0CYtuYjh459cSBS','http://img-ybh.oduosa.com/Fj05t-VXpjhoH0CYtuYjh459cSBS'); /* 10.jpg*/
+INSERT INTO t_opt_adv_banner (evebNum,clientShow,advType,picPcPath,picMbPath) VALUES(11,2,1,'http://img-ybh.oduosa.com/FowHCHOIe2VOU0PTUjOnVH09qvIp','http://img-ybh.oduosa.com/FowHCHOIe2VOU0PTUjOnVH09qvIp'); /* 11.jpg*/
+INSERT INTO t_opt_adv_banner (evebNum,clientShow,advType,picPcPath,picMbPath) VALUES(12,2,1,'http://img-ybh.oduosa.com/FrOaQuUAsSL-AJwsLI-xlhZk-1kB','http://img-ybh.oduosa.com/FrOaQuUAsSL-AJwsLI-xlhZk-1kB'); /* 12.png*/
+INSERT INTO t_opt_adv_banner (evebNum,clientShow,advType,picPcPath,picMbPath) VALUES(2,2,1,'http://img-ybh.oduosa.com/Fka9_6ywJ0eX4lj3yraoklQk1s3o','http://img-ybh.oduosa.com/Fka9_6ywJ0eX4lj3yraoklQk1s3o'); /* 2.jpg*/
+INSERT INTO t_opt_adv_banner (evebNum,clientShow,advType,picPcPath,picMbPath) VALUES(3,2,1,'http://img-ybh.oduosa.com/Fm4SVEpPEHdeHCnV6yVlJC5gNmIk','http://img-ybh.oduosa.com/Fm4SVEpPEHdeHCnV6yVlJC5gNmIk'); /* 3.jpg*/
+INSERT INTO t_opt_adv_banner (evebNum,clientShow,advType,picPcPath,picMbPath) VALUES(4,2,1,'http://img-ybh.oduosa.com/Fmgw06566GTunoN1hD9GUFTvJFPF','http://img-ybh.oduosa.com/Fmgw06566GTunoN1hD9GUFTvJFPF'); /* 4.jpg*/
+INSERT INTO t_opt_adv_banner (evebNum,clientShow,advType,picPcPath,picMbPath) VALUES(5,2,1,'http://img-ybh.oduosa.com/FrLOuVBOLWyWXB0PNbkqTENmJ1V8','http://img-ybh.oduosa.com/FrLOuVBOLWyWXB0PNbkqTENmJ1V8'); /* 05.jpg*/
+INSERT INTO t_opt_adv_banner (evebNum,clientShow,advType,picPcPath,picMbPath) VALUES(6,2,1,'http://img-ybh.oduosa.com/FrgnHFCGnnOspmsjcfQhUQXLvsQn','http://img-ybh.oduosa.com/FrgnHFCGnnOspmsjcfQhUQXLvsQn'); /* 6.jpg*/
+INSERT INTO t_opt_adv_banner (evebNum,clientShow,advType,picPcPath,picMbPath) VALUES(7,2,1,'http://img-ybh.oduosa.com/FqE6BdIVn4NkLKqETc9XLTRRFDNy','http://img-ybh.oduosa.com/FqE6BdIVn4NkLKqETc9XLTRRFDNy'); /* 07.jpg*/
+INSERT INTO t_opt_adv_banner (evebNum,clientShow,advType,picPcPath,picMbPath) VALUES(8,2,1,'http://img-ybh.oduosa.com/Fvbe2SN8Widj50s9AbmqmBVrLPme','http://img-ybh.oduosa.com/Fvbe2SN8Widj50s9AbmqmBVrLPme'); /* 8.jpg*/
+INSERT INTO t_opt_adv_banner (evebNum,clientShow,advType,picPcPath,picMbPath) VALUES(9,2,1,'http://img-ybh.oduosa.com/Fo45MqUTie3wa38cMG_0onWABBcJ','http://img-ybh.oduosa.com/Fo45MqUTie3wa38cMG_0onWABBcJ'); /* 9.jpg*/
+
+
+/**模型  1**/
+insert into t_opt_adv_banner (evebNum,clientShow,advType,picPcPath,picMbPath) values(1,0,5,'http://img-ybh.oduosa.com/FhS-u4SbTSM0cuIJo5N7zSdpMwiU',''); /* 彩票游戏.jpg*/
+insert into t_opt_adv_banner (evebNum,clientShow,advType,picPcPath,picMbPath) values(1,0,6,'http://img-ybh.oduosa.com/Fjw4Vmv0egmKDHX6304u6P7lhhaK',''); /* 手机投注.jpg*/
+insert into t_opt_adv_banner (evebNum,clientShow,advType,picPcPath,picMbPath) values(1,0,3,'http://img-ybh.oduosa.com/Fj0ONydNDDR8Z6YgBLWZzyrzhwDK',''); /* 电子游艺.jpg*/
+insert into t_opt_adv_banner (evebNum,clientShow,advType,picPcPath,picMbPath) values(1,0,2,'http://img-ybh.oduosa.com/FkL3G6jyHRUFQk0gpNHfXT7RGys0',''); /* 真人娛樂.jpg*/
+/**模型  2**/
+insert into t_opt_adv_banner (evebNum,clientShow,advType,picPcPath,picMbPath) values(2,0,5,'http://img-ybh.oduosa.com/FpOq2D85_8rEC34H2sxIF7mCIHWe',''); /* 彩票游戏.jpg*/
+insert into t_opt_adv_banner (evebNum,clientShow,advType,picPcPath,picMbPath) values(2,0,6,'http://img-ybh.oduosa.com/FpNCT_5rmmOeyQYkvUpOCb4WWSf3',''); /* 手机投注.jpg*/
+insert into t_opt_adv_banner (evebNum,clientShow,advType,picPcPath,picMbPath) values(2,0,3,'http://img-ybh.oduosa.com/FtUHHVzvV54vbYug0GxOfdPTB3GF',''); /* 电子游艺.jpg*/
+insert into t_opt_adv_banner (evebNum,clientShow,advType,picPcPath,picMbPath) values(2,0,2,'http://img-ybh.oduosa.com/FuoG21xrUMobZvRwOlsnX_UeijKF',''); /* 真人.jpg*/
+/**模型  3**/
+INSERT INTO t_opt_adv_banner (evebNum,clientShow,advType,picPcPath,picMbPath) VALUES(3,0,5,'http://img-ybh.oduosa.com/FqnilO5N1bfVfDjOGoY80CAzuilk',''); /* 彩票游戏.jpg*/
+INSERT INTO t_opt_adv_banner (evebNum,clientShow,advType,picPcPath,picMbPath) VALUES(3,0,6,'http://img-ybh.oduosa.com/FnEP8IiNS93ArD3Dz7-t_pEYCM3L',''); /* 手机投注.jpg*/
+INSERT INTO t_opt_adv_banner (evebNum,clientShow,advType,picPcPath,picMbPath) VALUES(3,0,3,'http://img-ybh.oduosa.com/Foo4ehSjaHbPRnJ_bVv7PHZ1zKJR',''); /* 电子游艺.jpg*/
+INSERT INTO t_opt_adv_banner (evebNum,clientShow,advType,picPcPath,picMbPath) VALUES(3,0,2,'http://img-ybh.oduosa.com/FjKp2BcTH0kGPPj2YZyj5J4nk5-p',''); /* 真人娱乐.jpg*/
+/**模型  4**/
+insert into t_opt_adv_banner (evebNum,clientShow,advType,picPcPath,picMbPath) values(4,0,5,'http://img-ybh.oduosa.com/FpOt3v3xRFlZpdXqAjnqyXKK-VfK',''); /* 彩票游戏.jpg*/
+insert into t_opt_adv_banner (evebNum,clientShow,advType,picPcPath,picMbPath) values(4,0,6,'http://img-ybh.oduosa.com/Fj5PlRkCeL-Qs7Nh4ZcValu2FQRm',''); /* 手机投注.jpg*/
+insert into t_opt_adv_banner (evebNum,clientShow,advType,picPcPath,picMbPath) values(4,0,3,'http://img-ybh.oduosa.com/FkVizxgITdWOzPzY_1_PgG_zsMMD',''); /* 电子游艺.jpg*/
+insert into t_opt_adv_banner (evebNum,clientShow,advType,picPcPath,picMbPath) values(4,0,2,'http://img-ybh.oduosa.com/FkaRdu_1FOFzAniarRzJ_XF5_lWk',''); /* 真人视讯.jpg*/
+/**模型  5**/
+insert into t_opt_adv_banner (evebNum,clientShow,advType,picPcPath,picMbPath) values(5,0,5,'http://img-ybh.oduosa.com/Fq_tyQaiuJxtFFrZkdX-2olxuRzJ',''); /* 彩票游戏.jpg*/
+insert into t_opt_adv_banner (evebNum,clientShow,advType,picPcPath,picMbPath) values(5,0,6,'http://img-ybh.oduosa.com/Fgxhq1UYi_501EzEH0oKmTwdqmPz',''); /* 手机投注.jpg*/
+insert into t_opt_adv_banner (evebNum,clientShow,advType,picPcPath,picMbPath) values(5,0,3,'http://img-ybh.oduosa.com/Fr_RqouWWhI1YBqdoYKhEieYDT8O',''); /* 电子游艺.jpg*/
+insert into t_opt_adv_banner (evebNum,clientShow,advType,picPcPath,picMbPath) values(5,0,2,'http://img-ybh.oduosa.com/FoyIxysgOraOsFy9uykeNxufN4WP',''); /* 真人娱乐.jpg*/
+/**模型  6**/
+INSERT INTO t_opt_adv_banner (evebNum,clientShow,advType,picPcPath,picMbPath) VALUES(6,0,5,'http://img-ybh.oduosa.com/FqWkg7KlOtXGNQVA-sEEAm5SaBe5',''); /* 彩票游戏.jpg*/
+INSERT INTO t_opt_adv_banner (evebNum,clientShow,advType,picPcPath,picMbPath) VALUES(6,0,6,'http://img-ybh.oduosa.com/FkJMOrjGplOHMoeFKSHcAewB_9LN',''); /* 手机投注.jpg*/
+INSERT INTO t_opt_adv_banner (evebNum,clientShow,advType,picPcPath,picMbPath) VALUES(6,0,3,'http://img-ybh.oduosa.com/Fn-agT1-33zECU55JVmzaq7VozzT',''); /* 电子游艺.jpg*/
+INSERT INTO t_opt_adv_banner (evebNum,clientShow,advType,picPcPath,picMbPath) VALUES(6,0,2,'http://img-ybh.oduosa.com/FvDViD3Ge3-GJrYY7VNdXxPxdfI7',''); /* 真人娱乐-banner3.jpg*/
+/**模型  7**/
+insert into t_opt_adv_banner (evebNum,clientShow,advType,picPcPath,picMbPath) values(7,0,5,'http://img-ybh.oduosa.com/FgZjsrwhRz1WA3Ugu2sQ7FkqN6Ca',''); /* 彩票.jpg*/
+insert into t_opt_adv_banner (evebNum,clientShow,advType,picPcPath,picMbPath) values(7,0,6,'http://img-ybh.oduosa.com/FtmaQDOOlzrsao7EAp294zfrrY7E',''); /* 手机.jpg*/
+insert into t_opt_adv_banner (evebNum,clientShow,advType,picPcPath,picMbPath) values(7,0,3,'http://img-ybh.oduosa.com/Fv4If5B1JkKQPJCmNd9YIrmwivoB',''); /* 电子.jpg*/
+insert into t_opt_adv_banner (evebNum,clientShow,advType,picPcPath,picMbPath) values(7,0,2,'http://img-ybh.oduosa.com/Fo35IWiS8cGSjPW6CuQzg5R2TEX-',''); /* 真人.jpg*/
+/**模型  8**/
+INSERT INTO t_opt_adv_banner (evebNum,clientShow,advType,picPcPath,picMbPath) VALUES(8,0,5,'http://img-ybh.oduosa.com/FqWkg7KlOtXGNQVA-sEEAm5SaBe5',''); /* 彩票游戏.jpg*/
+INSERT INTO t_opt_adv_banner (evebNum,clientShow,advType,picPcPath,picMbPath) VALUES(8,0,6,'http://img-ybh.oduosa.com/FkJMOrjGplOHMoeFKSHcAewB_9LN',''); /* 手机投注.jpg*/
+INSERT INTO t_opt_adv_banner (evebNum,clientShow,advType,picPcPath,picMbPath) VALUES(8,0,3,'http://img-ybh.oduosa.com/Fn-agT1-33zECU55JVmzaq7VozzT',''); /* 电子游艺.jpg*/
+INSERT INTO t_opt_adv_banner (evebNum,clientShow,advType,picPcPath,picMbPath) VALUES(8,0,2,'http://img-ybh.oduosa.com/FvDViD3Ge3-GJrYY7VNdXxPxdfI7',''); /* 真人娱乐-banner3.jpg*/
+/**模型  9**/
+INSERT INTO t_opt_adv_banner (evebNum,clientShow,advType,picPcPath,picMbPath) VALUES(9,0,5,'http://img-ybh.oduosa.com/FuKrQLr86D8zWc_5Pn4BEfPVWQMF',''); /* 彩票游戏.jpg*/
+INSERT INTO t_opt_adv_banner (evebNum,clientShow,advType,picPcPath,picMbPath) VALUES(9,0,6,'http://img-ybh.oduosa.com/FpPQJR4FbQOHTcmvlXNS-3IV7BwU',''); /* 手机投注.jpg*/
+INSERT INTO t_opt_adv_banner (evebNum,clientShow,advType,picPcPath,picMbPath) VALUES(9,0,3,'http://img-ybh.oduosa.com/Fn1HYOM1e4gsbIAldVHDsOzJGOJI',''); /* 电子游艺.jpg*/
+INSERT INTO t_opt_adv_banner (evebNum,clientShow,advType,picPcPath,picMbPath) VALUES(9,0,2,'http://img-ybh.oduosa.com/FlS0zN5h88T8TbQ8BRk039BVlG8z',''); /* 真人娱乐.jpg*/
+/**模型  10**/
+INSERT INTO t_opt_adv_banner (evebNum,clientShow,advType,picPcPath,picMbPath) VALUES(10,0,5,'http://img-ybh.oduosa.com/FqWkg7KlOtXGNQVA-sEEAm5SaBe5',''); /* 彩票游戏.jpg*/
+INSERT INTO t_opt_adv_banner (evebNum,clientShow,advType,picPcPath,picMbPath) VALUES(10,0,6,'http://img-ybh.oduosa.com/FkJMOrjGplOHMoeFKSHcAewB_9LN',''); /* 手机投注.jpg*/
+INSERT INTO t_opt_adv_banner (evebNum,clientShow,advType,picPcPath,picMbPath) VALUES(10,0,3,'http://img-ybh.oduosa.com/Fn-agT1-33zECU55JVmzaq7VozzT',''); /* 电子游艺.jpg*/
+INSERT INTO t_opt_adv_banner (evebNum,clientShow,advType,picPcPath,picMbPath) VALUES(10,0,2,'http://img-ybh.oduosa.com/FvDViD3Ge3-GJrYY7VNdXxPxdfI7',''); /* 真人娱乐-banner3.jpg*/
+/**模型  11**/
+insert into t_opt_adv_banner (evebNum,clientShow,advType,picPcPath,picMbPath) values(11,0,5,'http://img-ybh.oduosa.com/FvbxJfDfqAFVN_mVG4px0JpKvXwA',''); /* 彩票.jpg*/
+insert into t_opt_adv_banner (evebNum,clientShow,advType,picPcPath,picMbPath) values(11,0,6,'http://img-ybh.oduosa.com/FnJMUyCfhBiRatLX4_YgT2rhzEGv',''); /* 手机.jpg*/
+insert into t_opt_adv_banner (evebNum,clientShow,advType,picPcPath,picMbPath) values(11,0,3,'http://img-ybh.oduosa.com/FoOLdSQzQOnIpRsJgMPb0wmG1_PR',''); /* 电子.jpg*/
+insert into t_opt_adv_banner (evebNum,clientShow,advType,picPcPath,picMbPath) values(11,0,2,'http://img-ybh.oduosa.com/FhxkKkk2JAPtGX46c61HVUAalJPs',''); /* 真人.jpg*/
+/**模型  12**/
+INSERT INTO t_opt_adv_banner (evebNum,clientShow,advType,picPcPath,picMbPath) VALUES(12,0,5,'http://img-ybh.oduosa.com/FqWkg7KlOtXGNQVA-sEEAm5SaBe5',''); /* 彩票游戏.jpg*/
+INSERT INTO t_opt_adv_banner (evebNum,clientShow,advType,picPcPath,picMbPath) VALUES(12,0,6,'http://img-ybh.oduosa.com/FkJMOrjGplOHMoeFKSHcAewB_9LN',''); /* 手机投注.jpg*/
+INSERT INTO t_opt_adv_banner (evebNum,clientShow,advType,picPcPath,picMbPath) VALUES(12,0,3,'http://img-ybh.oduosa.com/Fn-agT1-33zECU55JVmzaq7VozzT',''); /* 电子游艺.jpg*/
+INSERT INTO t_opt_adv_banner (evebNum,clientShow,advType,picPcPath,picMbPath) VALUES(12,0,2,'http://img-ybh.oduosa.com/FvDViD3Ge3-GJrYY7VNdXxPxdfI7',''); /* 真人娱乐-banner3.jpg*/
+
+
+/**模型  3  首页**/
+UPDATE  t_opt_adv_banner SET picPcPath='http://img-ybh.oduosa.com/Fm4SVEpPEHdeHCnV6yVlJC5gNmIk', picMbPath='http://img-ybh.oduosa.com/Fm4SVEpPEHdeHCnV6yVlJC5gNmIk' WHERE evebNum=3 AND advType= 1;
+/**模型  3 真人**/
+UPDATE  t_opt_adv_banner SET picPcPath='http://img-ybh.oduosa.com/FjKp2BcTH0kGPPj2YZyj5J4nk5-p' WHERE evebNum=3 AND advType= 2;
+/**模型  3 电子**/
+UPDATE  t_opt_adv_banner SET picPcPath='http://img-ybh.oduosa.com/Foo4ehSjaHbPRnJ_bVv7PHZ1zKJR' WHERE evebNum=3 AND advType= 3;
+/**模型  3 彩票**/
+UPDATE  t_opt_adv_banner SET picPcPath='http://img-ybh.oduosa.com/FqnilO5N1bfVfDjOGoY80CAzuilk' WHERE evebNum=3 AND advType= 5;
+/**模型  3 手机**/
+UPDATE  t_opt_adv_banner SET picPcPath='http://img-ybh.oduosa.com/FnEP8IiNS93ArD3Dz7-t_pEYCM3L' WHERE evebNum=3 AND advType= 6;
+
+
+
+
+/**2018-08-09 修改**/
+/**模板 首页**/
+UPDATE  t_opt_adv_banner SET picPcPath='http://img-ybh.oduosa.com/FrLOuVBOLWyWXB0PNbkqTENmJ1V8', picMbPath='http://img-ybh.oduosa.com/FrLOuVBOLWyWXB0PNbkqTENmJ1V8' WHERE evebNum=05 AND advType= 1; /* 05首页.jpg*/
+UPDATE  t_opt_adv_banner SET picPcPath='http://img-ybh.oduosa.com/FiKm8zghp_ulMC7HgmEPV0PS5VG0', picMbPath='http://img-ybh.oduosa.com/FiKm8zghp_ulMC7HgmEPV0PS5VG0' WHERE evebNum=06 AND advType= 1; /* 06首页.jpg*/
+UPDATE  t_opt_adv_banner SET picPcPath='http://img-ybh.oduosa.com/FqE6BdIVn4NkLKqETc9XLTRRFDNy', picMbPath='http://img-ybh.oduosa.com/FqE6BdIVn4NkLKqETc9XLTRRFDNy' WHERE evebNum=07 AND advType= 1; /* 07首页-3.jpg*/
+UPDATE  t_opt_adv_banner SET picPcPath='http://img-ybh.oduosa.com/FuNmJC6R2-ANULUJ_r_ZUVNeJGKC', picMbPath='http://img-ybh.oduosa.com/FuNmJC6R2-ANULUJ_r_ZUVNeJGKC' WHERE evebNum=08 AND advType= 1; /* 08首页.jpg*/
+UPDATE  t_opt_adv_banner SET picPcPath='http://img-ybh.oduosa.com/FiCiRR-UO7xjiXAyrc8C_vBxzZ_S', picMbPath='http://img-ybh.oduosa.com/FiCiRR-UO7xjiXAyrc8C_vBxzZ_S' WHERE evebNum=09 AND advType= 1; /* 09首页.jpg*/
+UPDATE  t_opt_adv_banner SET picPcPath='http://img-ybh.oduosa.com/FqXbHWc_6Ec-C6xbKqYAO8ysJfze', picMbPath='http://img-ybh.oduosa.com/FqXbHWc_6Ec-C6xbKqYAO8ysJfze' WHERE evebNum=10 AND advType= 1; /* 10首页.jpg*/
+UPDATE  t_opt_adv_banner SET picPcPath='http://img-ybh.oduosa.com/FowHCHOIe2VOU0PTUjOnVH09qvIp', picMbPath='http://img-ybh.oduosa.com/FowHCHOIe2VOU0PTUjOnVH09qvIp' WHERE evebNum=11 AND advType= 1; /* 11index.jpg*/
+UPDATE  t_opt_adv_banner SET picPcPath='http://img-ybh.oduosa.com/FrOZwoUEs78G10dvDnSXFCpakLRR', picMbPath='http://img-ybh.oduosa.com/FrOZwoUEs78G10dvDnSXFCpakLRR' WHERE evebNum=12 AND advType= 1; /* 12首页.jpg*/
+/**模型  4**/
+UPDATE  t_opt_adv_banner SET picPcPath='https://img-ybh.oduosa.com/Ft4q3CRz-hkB_p5gRauN7jo_TF7s' WHERE evebNum=4 AND advType=5; /* 彩票游戏.jpg*/
+UPDATE  t_opt_adv_banner SET picPcPath='https://img-ybh.oduosa.com/FveQxGp5oNhoOJ-pLyWESuoksYiQ' WHERE evebNum=4 AND advType=6; /* 手机投注.jpg*/
+UPDATE  t_opt_adv_banner SET picPcPath='https://img-ybh.oduosa.com/FjeyWReOfp1wJYVAkoojmL4VDeUk' WHERE evebNum=4 AND advType=3; /* 电子游艺.jpg*/
+UPDATE  t_opt_adv_banner SET picPcPath='https://img-ybh.oduosa.com/FpespZsuuVOKXMmeRPO6D-CpRnhD' WHERE evebNum=4 AND advType=2; /* 真人视讯.jpg*/
+/**模型  5**/
+UPDATE  t_opt_adv_banner SET picPcPath='http://img-ybh.oduosa.com/FgyXIb2HjfZi2zjtZhit8yd79Gsa' WHERE evebNum=5 AND advType=5; /* 彩票游戏.jpg*/
+UPDATE  t_opt_adv_banner SET picPcPath='http://img-ybh.oduosa.com/FjUA91ytS4Eqyb_d3V_XbpNxJCpY' WHERE evebNum=5 AND advType=6; /* 手机投注.jpg*/
+UPDATE  t_opt_adv_banner SET picPcPath='http://img-ybh.oduosa.com/FoFI0ixroOuEHXOZuI9-0XWFl-gl' WHERE evebNum=5 AND advType=3; /* 电子游艺.jpg*/
+UPDATE  t_opt_adv_banner SET picPcPath='http://img-ybh.oduosa.com/FsZnX3BSH5Wq8LRJ3HSfLvzF5GRY' WHERE evebNum=5 AND advType=2; /* 真人娱乐.jpg*/
+/**模型  6**/
+UPDATE  t_opt_adv_banner SET picPcPath='http://img-ybh.oduosa.com/FsyJDizZ0Vv981eMYr3QD2OdR1UJ' WHERE evebNum=6 AND advType=5; /* 彩票游戏.png*/
+UPDATE  t_opt_adv_banner SET picPcPath='http://img-ybh.oduosa.com/FlMNqKAiu8opJklYTEgrt1xi_9r8' WHERE evebNum=6 AND advType=6; /* 手机投注.png*/
+UPDATE  t_opt_adv_banner SET picPcPath='http://img-ybh.oduosa.com/FuovoBUCVIFfgURwPdp32RrGJMnr' WHERE evebNum=6 AND advType=3; /* 电子游艺.png*/
+UPDATE  t_opt_adv_banner SET picPcPath='http://img-ybh.oduosa.com/FjSfSbfnhPFzLIsURGoBfp8htr9z' WHERE evebNum=6 AND advType=2; /* 真人娱乐.png*/
+/**模型  7**/
+UPDATE  t_opt_adv_banner SET picPcPath='http://img-ybh.oduosa.com/FgZjsrwhRz1WA3Ugu2sQ7FkqN6Ca' WHERE evebNum=7 AND advType=5; /* 彩票.jpg*/
+UPDATE  t_opt_adv_banner SET picPcPath='http://img-ybh.oduosa.com/FtmaQDOOlzrsao7EAp294zfrrY7E' WHERE evebNum=7 AND advType=6; /* 手机.jpg*/
+UPDATE  t_opt_adv_banner SET picPcPath='http://img-ybh.oduosa.com/Fv4If5B1JkKQPJCmNd9YIrmwivoB' WHERE evebNum=7 AND advType=3; /* 电子.jpg*/
+UPDATE  t_opt_adv_banner SET picPcPath='http://img-ybh.oduosa.com/Fo35IWiS8cGSjPW6CuQzg5R2TEX-' WHERE evebNum=7 AND advType=2; /* 真人.jpg*/
+/**模型  8**/
+UPDATE  t_opt_adv_banner SET picPcPath='http://img-ybh.oduosa.com/FmKPnOR7vtZwtdZA-82Ityl1V6Ql' WHERE evebNum=8 AND advType=5; /* 彩票游戏.jpg*/
+UPDATE  t_opt_adv_banner SET picPcPath='http://img-ybh.oduosa.com/Fg1JR0co8_Lv6hlOLxA98N0akfK7' WHERE evebNum=8 AND advType=6; /* 手机投注.jpg*/
+UPDATE  t_opt_adv_banner SET picPcPath='http://img-ybh.oduosa.com/FpVRcvheLDeTsC8KPwMNqywXalW7' WHERE evebNum=8 AND advType=3; /* 电子游艺.jpg*/
+UPDATE  t_opt_adv_banner SET picPcPath='http://img-ybh.oduosa.com/FicCZq8JafcaITo3b0APZ_ZtBaqL' WHERE evebNum=8 AND advType=2; /* 真人娱乐.jpg*/
+/**模型  9**/
+UPDATE  t_opt_adv_banner SET picPcPath='http://img-ybh.oduosa.com/FtaA3wozM6JKKa6nP_bTm23UA_-C' WHERE evebNum=9 AND advType=5; /* 彩票游戏.jpg*/
+UPDATE  t_opt_adv_banner SET picPcPath='http://img-ybh.oduosa.com/FoKvRPzH0FJEdWQ0mkbL_HeX2kmR' WHERE evebNum=9 AND advType=6; /* 手机投注.jpg*/
+UPDATE  t_opt_adv_banner SET picPcPath='http://img-ybh.oduosa.com/Fgq54iZ7EyNS3IBNPhexlPfX3ujr' WHERE evebNum=9 AND advType=3; /* 电子游艺.jpg*/
+UPDATE  t_opt_adv_banner SET picPcPath='http://img-ybh.oduosa.com/FswxtguYYEAC5_UTmsp89PNWm2J_' WHERE evebNum=9 AND advType=2; /* 真人娱乐.jpg*/
+/**模型  10**/
+UPDATE  t_opt_adv_banner SET picPcPath='http://img-ybh.oduosa.com/FsY2goB4093GeA-HzWKLnqpraLdY' WHERE evebNum=10 AND advType=5; /* 彩票游戏.jpg*/
+UPDATE  t_opt_adv_banner SET picPcPath='http://img-ybh.oduosa.com/FuxSM0FxVIqLHn0UOCHnBUd-Nuso' WHERE evebNum=10 AND advType=6; /* 手机投注.jpg*/
+UPDATE  t_opt_adv_banner SET picPcPath='http://img-ybh.oduosa.com/Fviqrs4aQedwbYfvv9guQEv_8qZu' WHERE evebNum=10 AND advType=3; /* 电子游艺.jpg*/
+UPDATE  t_opt_adv_banner SET picPcPath='http://img-ybh.oduosa.com/FldWB5a15uZR5rmlbX55p_0IZD5l' WHERE evebNum=10 AND advType=2; /* 真人娱乐.jpg*/
+/**模型  11**/
+UPDATE  t_opt_adv_banner SET picPcPath='http://img-ybh.oduosa.com/FvbxJfDfqAFVN_mVG4px0JpKvXwA' WHERE evebNum=11 AND advType=5; /* 彩票.jpg*/
+UPDATE  t_opt_adv_banner SET picPcPath='http://img-ybh.oduosa.com/FnJMUyCfhBiRatLX4_YgT2rhzEGv' WHERE evebNum=11 AND advType=6; /* 手机.jpg*/
+UPDATE  t_opt_adv_banner SET picPcPath='http://img-ybh.oduosa.com/FoOLdSQzQOnIpRsJgMPb0wmG1_PR' WHERE evebNum=11 AND advType=3; /* 电子.jpg*/
+UPDATE  t_opt_adv_banner SET picPcPath='http://img-ybh.oduosa.com/FhxkKkk2JAPtGX46c61HVUAalJPs' WHERE evebNum=11 AND advType=2; /* 真人.jpg*/
+/**模型  12**/
+UPDATE  t_opt_adv_banner SET picPcPath='http://img-ybh.oduosa.com/FilLd3YWoxt88RCbatOU9aPb0iQ3' WHERE evebNum=12 AND advType=5; /* 彩票游戏.jpg*/
+UPDATE  t_opt_adv_banner SET picPcPath='http://img-ybh.oduosa.com/FnRNh2bNywzgJAL7a-kZdf3ssviL' WHERE evebNum=12 AND advType=6; /* 手机投注.jpg*/
+UPDATE  t_opt_adv_banner SET picPcPath='http://img-ybh.oduosa.com/FjmpgWcrFENuTYCpyfK5Z8rm7XDM' WHERE evebNum=12 AND advType=3; /* 电子游艺.jpg*/
+UPDATE  t_opt_adv_banner SET picPcPath='http://img-ybh.oduosa.com/FiMj7HLiN3ZF7YGu_diWBW0WZAn8' WHERE evebNum=12 AND advType=2; /* 真人娱乐.jpg*/
+
+
+/**2018-08-13 修改**/
+/**模板 首页**/
+UPDATE  t_opt_adv_banner SET picMbPath='https://img-ybh.oduosa.com/FgIs7a2Elvq9jPj_2fy4P_KyCoZ4' WHERE evebNum=1 AND advType= 1; /* 01.jpg*/
+
+
+UPDATE  t_opt_adv_banner SET picPcPath='https://img-ybh.oduosa.com/Fs3aSv8V5EHhDPpOabLqXanHMiog' WHERE evebNum=7 AND advType= 1; /* 07.jpg*/
+
+
+/**模型  4**/
+UPDATE  t_opt_adv_banner SET picPcPath='https://img-ybh.oduosa.com/FqRc_iW2WgvsgjTcEYoORZG8rupe' WHERE evebNum=4 AND advType=2; /* 真人视讯.jpg*/
+/**模型  5**/
+UPDATE  t_opt_adv_banner SET picPcPath='https://img-ybh.oduosa.com/FiThmvaHzF11Axbq2KJk3cUkWwRQ' WHERE evebNum=5 AND advType=6; /* 手机投注.jpg*/
+/**模型  6**/
+UPDATE  t_opt_adv_banner SET picPcPath='https://img-ybh.oduosa.com/FkBvMWrMJcrIREKPNd7YvcRegH_t' WHERE evebNum=6 AND advType=5; /* 彩票游戏.png*/
+UPDATE  t_opt_adv_banner SET picPcPath='https://img-ybh.oduosa.com/FhizvSlTRyYMNkHzm_77sVAcUnZA' WHERE evebNum=6 AND advType=6; /* 手机投注.png*/
+UPDATE  t_opt_adv_banner SET picPcPath='https://img-ybh.oduosa.com/FtcpbJMfoAcNcrUzCOIIku__t89-' WHERE evebNum=6 AND advType=3; /* 电子游艺.png*/
+UPDATE  t_opt_adv_banner SET picPcPath='https://img-ybh.oduosa.com/Fnnca8n2HO-jMPPQaNph0ZKCJZA4' WHERE evebNum=6 AND advType=2; /* 真人娱乐.png*/
+/**模型  7**/
+UPDATE  t_opt_adv_banner SET picPcPath='https://img-ybh.oduosa.com/Fg71bF40kCang81ofISmYQ6OOb4c' WHERE evebNum=7 AND advType=5; /* 彩票.jpg*/
+UPDATE  t_opt_adv_banner SET picPcPath='https://img-ybh.oduosa.com/Fs7r5aF4gWZhHL1Lans4psFXqq15' WHERE evebNum=7 AND advType=6; /* 手机.jpg*/
+UPDATE  t_opt_adv_banner SET picPcPath='https://img-ybh.oduosa.com/FpgCv3YJDVW0_Lg7D7zWduUCZwXw' WHERE evebNum=7 AND advType=3; /* 电子.jpg*/
+UPDATE  t_opt_adv_banner SET picPcPath='https://img-ybh.oduosa.com/FmUGKWFM3Fg4LMDHFjeXE0Oa8og5' WHERE evebNum=7 AND advType=2; /* 真人.jpg*/
+/**模型  10**/
+UPDATE  t_opt_adv_banner SET picPcPath='https://img-ybh.oduosa.com/FmXJbzTGlBvc6IZgNriVTUvIC-9H' WHERE evebNum=10 AND advType=5; /* 彩票游戏.jpg*/
+UPDATE  t_opt_adv_banner SET picPcPath='https://img-ybh.oduosa.com/Fmn6clwHWHbPbG5EZRjtKoALZvqo' WHERE evebNum=10 AND advType=6; /* 手机投注.jpg*/
+UPDATE  t_opt_adv_banner SET picPcPath='https://img-ybh.oduosa.com/FlkVYNCsOI6s00EAO0HpUhvFLSgy' WHERE evebNum=10 AND advType=3; /* 电子游艺.jpg*/
+UPDATE  t_opt_adv_banner SET picPcPath='https://img-ybh.oduosa.com/FhnQsvjJLoXRrhGaLSuPUMFXt3gk' WHERE evebNum=10 AND advType=2; /* 真人娱乐.jpg*/
+/**模型  11**/
+UPDATE  t_opt_adv_banner SET picPcPath='https://img-ybh.oduosa.com/FuFHeuS0kqFJLQcXVwsB81avBZsQ' WHERE evebNum=11 AND advType=5; /* 彩票.jpg*/
+UPDATE  t_opt_adv_banner SET picPcPath='https://img-ybh.oduosa.com/FjvUlelkebe7CG81YYOsKmUJFwpv' WHERE evebNum=11 AND advType=6; /* 手机.jpg*/
+UPDATE  t_opt_adv_banner SET picPcPath='https://img-ybh.oduosa.com/Fsoq6amTkeQwUx9NWFTGBCs3F6PZ' WHERE evebNum=11 AND advType=3; /* 电子.jpg*/
+UPDATE  t_opt_adv_banner SET picPcPath='https://img-ybh.oduosa.com/FlWmRv1Gu2lScjInPhVL1u1mz6Y1' WHERE evebNum=11 AND advType=2; /* 真人.jpg*/
+
+
+
+
+
+
+

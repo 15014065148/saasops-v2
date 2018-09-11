@@ -1,0 +1,211 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.eveb.saasops.modules.system.onlinepay.mapper.MyOnlinepayMapper">
+
+    <!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="com.eveb.saasops.modules.system.onlinepay.entity.SetBacicOnlinepay" id="setBacicOnlinepayMap">
+        <id property="id" column="id"/>
+        <result property="code" column="code"/>
+        <result property="name" column="name"/>
+        <result property="merNo" column="merNo"/>
+        <result property="paymentId" column="paymentId"/>
+        <result property="isEnable" column="isEnable"/>
+        <result property="createUser" column="createUser"/>
+        <result property="createTime" column="createTime"/>
+        <result property="modifyUser" column="modifyUser"/>
+        <result property="modifyTime" column="modifyTime"/>
+        <result property="mbrGroupNum" column="mbrGroupNum"/>
+        <result property="paymentName" column="paymentName"/>
+        <result property="bankNum" column="bankNum"/>
+        <result property="mbrGroupType" column="mbrGroupType"/>
+        <result property="payClass" column="payClass"/>
+        <result property="payWay" column="payWay"/>
+    </resultMap>
+    <delete id="deleteBatch">
+        delete from set_bacic_onlinePay where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+    <select id="getAllBacicOnlinepay" resultType="com.eveb.saasops.modules.system.onlinepay.entity.SetBacicOnlinepay">
+      select t1.*,t2.payment paymentName,t1.name payName from set_bacic_onlinePay t1 left join t_op_pay t2 on t1.paymentId=t2.id;
+    </select>
+
+    <select id="queryConditions" resultMap="setBacicOnlinepayMap"
+            parameterType="com.eveb.saasops.modules.system.onlinepay.entity.SetBacicOnlinepay">
+        select CC.*,E.depositAmount,E.payCount, IFNULL(F.depositAmountDaily,0) depositAmountDaily from (SELECT * from (
+        SELECT A.*,B.payment paymentName,B.payClass,C.mbrGroupNum,D.bankNum from set_bacic_onlinePay A
+        LEFT join t_op_pay B on B.id =A.paymentId
+        LEFT join (SELECT COUNT(1) bankNum,g.paymentId FROM t_op_payBankRelation g LEFT join t_bs_bank f on
+        g.bankId=f.id
+        <where>
+            <if test=" bankName != null and bankName != ''">
+                f.bankName LIKE CONCAT('%',#{bankName}, '%')
+            </if>
+        </where>
+        GROUP by g.paymentId
+        ) D on B.id =D.paymentId
+        LEFT join (SELECT COUNT(1) mbrGroupNum ,onlinePayId FROM set_basic_PayMbrGroupRelation sbp
+        inner join mbr_group mg on mg.id=sbp.mbrGroupId GROUP BY onlinePayId ) C on C.onlinePayId =A.id
+        <where>
+            A.mbrGroupType =2
+            <if test=" paymentName !=null and paymentName != '' ">
+                and B.payClass LIKE CONCAT('%',#{paymentName}, '%')
+            </if>
+            <if test=" name !=null and name != '' ">
+                and A.name LIKE CONCAT('%',#{name}, '%')
+            </if>
+            <if test=" merNo !=null and merNo != '' ">
+                and A.merNo LIKE CONCAT('%',#{merNo}, '%')
+            </if>
+            <if test="isEnabless != null and isEnabless.size() >0">
+                and A.isEnable in
+                <foreach item="isEnable" collection="isEnabless" open="(" separator="," close=")">
+                    #{isEnable}
+                </foreach>
+            </if>
+            <if test=" devSource !=null and devSource != ''">
+                and A.devSource LIKE CONCAT('%',#{devSource}, '%')
+            </if>
+        </where>
+        ) AA
+        UNION
+        SELECT * FROM (
+        SELECT A.*,B.payment paymentName,B.payClass,C.mbrGroupNum,D.bankNum from set_bacic_onlinePay A
+        LEFT join t_op_pay B on B.id =A.paymentId
+        LEFT join (SELECT COUNT(1) bankNum,g.paymentId FROM t_op_payBankRelation g LEFT join t_bs_bank f on
+        g.bankId=f.id
+        <where>
+            <if test=" bankName != null and bankName != ''">
+                f.bankName LIKE CONCAT('%',#{bankName}, '%')
+            </if>
+        </where>
+        GROUP by g.paymentId
+        ) D on B.id =D.paymentId
+        LEFT join (SELECT sum(1) mbrGroupNum ,'1' mbrGroupType FROM mbr_group GROUP BY mbrGroupType) C on C.mbrGroupType
+        =A.mbrGroupType
+        <where>
+            A.mbrGroupType =1
+            <if test=" paymentName !=null and paymentName != '' ">
+                and B.payClass LIKE CONCAT('%',#{paymentName}, '%')
+            </if>
+            <if test=" name !=null and name != '' ">
+                and A.name LIKE CONCAT('%',#{name}, '%')
+            </if>
+            <if test=" merNo !=null and merNo != '' ">
+                and A.merNo LIKE CONCAT('%',#{merNo}, '%')
+            </if>
+            <if test="isEnabless != null and isEnabless.size() >0">
+                and A.isEnable in
+                <foreach item="isEnable" collection="isEnabless" open="(" separator="," close=")">
+                    #{isEnable}
+                </foreach>
+            </if>
+            <if test=" devSource !=null and devSource != ''">
+                and A.devSource LIKE CONCAT('%',#{devSource}, '%')
+            </if>
+
+        </where>
+        ) BB
+        ) CC
+        left join (select sum(depositAmount) depositAmount ,count(1) payCount,onlinePayId from fund_deposit where
+        isPayment =1 and companyPayId is null group by onlinePayId) E on E.onlinePayId =CC.id
+        left join ( select sum(depositAmount) depositAmountDaily,onlinePayId from fund_deposit where isPayment =1 and
+        companyPayId is null and DATE_FORMAT(createTime ,'%m-%d-%Y') = DATE_FORMAT(now(),'%m-%d-%Y') group by
+        onlinePayId ) F on F.onlinePayId =CC.id
+        where bankNum > 0
+    </select>
+    <!--查询支付平台及相关信息，下拉列表使用-->
+    <select id="queryPayment" resultType="java.util.Map">
+        SELECT DISTINCT top.id ,top.payment,top.payClass,top.payType,top.isEnable,top.payWay FROM t_op_pay top
+        LEFT JOIN t_op_payWebSiteRelation pwsr on pwsr.paymentId =top.id
+        LEFT JOIN t_cp_site tcs on tcs.id=pwsr.cpSiteId
+        <where>
+            <if test="siteCode != null and siteCode != ''">
+                tcs.siteCode=#{siteCode}
+            </if>
+        </where>
+    </select>
+    <!--通过平台id查找银行-->
+    <select id="queryPayBanks" parameterType="java.util.Map" resultType="java.util.Map">
+        SELECT B.* from t_op_payBankRelation A LEFT JOIN t_bs_bank B on A.bankId=B.id
+        <where>
+            <if test=" paymentId !=null and paymentId != '' ">
+                A.paymentId = #{paymentId}
+            </if>
+        </where>
+    </select>
+    <!--通过id查找关联的会员组-->
+    <select id="queryMbrGroupById" resultType="java.util.Map" parameterType="java.lang.String">
+      SELECT A.id groupId,A.groupName FROM mbr_group A
+          INNER JOIN set_basic_PayMbrGroupRelation B on A.id =B.mbrGroupId and B.onlinePayId = #{id}
+      where A.available = 1
+    </select>
+
+    <resultMap id="onlinePayRelations" type="com.eveb.saasops.modules.system.onlinepay.entity.OnlinePayRelations">
+        <id property="onlinePayId" column="onlinePayId"/>
+        <collection property="bankOptions" ofType="com.eveb.saasops.modules.system.onlinepay.entity.BankOptions">
+            <id property="value" column="bankId" javaType="java.lang.Integer"/>
+            <result property="text" column="bankName" javaType="java.lang.String"/>
+        </collection>
+        <collection property="selectedGroup" ofType="com.eveb.saasops.modules.system.onlinepay.entity.SelectedGroup">
+            <id property="id" column="groupId" javaType="java.lang.Integer"/>
+            <result property="groupName" column="groupName" javaType="java.lang.String"/>
+        </collection>
+    </resultMap>
+
+    <select id="selectBankAndGroup" resultMap="onlinePayRelations" parameterType="java.lang.Integer">
+        <if test="mbrGroupType == 2">
+            SELECT A.onlinePayId,D.groupName,D.id groupId,C.bankId,E.bankName from set_bacic_onlinePay B
+            LEFT JOIN set_basic_PayMbrGroupRelation A on A.onlinePayId = B.id
+            LEFT JOIN t_op_payBankRelation C on B.paymentId = C.paymentId
+            LEFT JOIN mbr_group D on D.id = A.mbrGroupId
+            LEFT JOIN t_bs_bank E on E.id = C.bankId
+            <where>
+                D.available =1
+                and A.onlinePayId = #{onlinePayId}
+            </where>
+        </if>
+        <if test="mbrGroupType == 1">
+            SELECT B.id onlinePayId,C.bankId,E.bankName from set_bacic_onlinePay B
+            left JOIN t_op_payBankRelation C on B.paymentId = C.paymentId
+            LEFT JOIN t_bs_bank E on E.id = C.bankId WHERE B.id = #{onlinePayId}
+        </if>
+    </select>
+
+
+    <resultMap id="OnlinePayPictureResultMap" type="com.eveb.saasops.api.modules.pay.pzpay.entity.OnlinePayPicture">
+        <id property="paymentId" column="BpaymentId"/>
+        <result property="name" column="name"/>
+        <result property="payType" column="payType"/>
+        <result property="minLimit" column="minLimit"/>
+        <result property="maxLimit" column="maxLimit"/>
+        <result property="urlMethod" column="urlMethod"/>
+        <result property="mBankLogo" column="mBankLogo"/>
+        <collection property="payData" ofType="com.eveb.saasops.api.modules.pay.pzpay.entity.PayPictureData">
+            <id property="id" column="id"/>
+            <result property="paymentId" column="BpaymentId"/>
+            <result property="bankName" column="bankName"/>
+            <result property="bankCode" column="bankCode"/>
+            <result property="bankLog" column="bankLog"/>
+        </collection>
+    </resultMap>
+    <select id="getPzpayPictureUrl" resultMap="OnlinePayPictureResultMap">
+         SELECT A.*,B.*,C.urlMethod from (select OP.name,OP.paymentId,PGR.onlinePayId payType ,OP.minLimit ,OP.maxLimit from set_bacic_onlinePay OP
+            inner join set_basic_PayMbrGroupRelation  PGR on PGR.onlinePayId = OP.id and OP.id in ( ${onlinePayId} )
+            inner join mbr_account MA on MA.groupId =PGR.mbrGroupId and MA.id = #{tOpPay.accountId}
+			inner join t_op_pay TOPP on OP.paymentId=TOPP.id
+                      where OP.isEnable =1 and OP.mbrGroupType = 2 and TOPP.payType in (#{tOpPay.payType},3) and OP.devSource LIKE CONCAT('%',#{tOpPay.devSource}, '%')
+            union all (select OP.name,OP.paymentId,OP.id payType ,OP.minLimit ,OP.maxLimit from set_bacic_onlinePay OP inner join t_op_pay TOPP on OP.paymentId=TOPP.id
+            where OP.mbrGroupType =1 and OP.isEnable = 1 and OP.id in ( ${onlinePayId} ) and TOPP.payType in (#{tOpPay.payType},3) and OP.devSource LIKE CONCAT('%',#{tOpPay.devSource}, '%'))
+                      ) A
+        inner join (select tbb.*,top.paymentId BpaymentId,t.mBankLog mBankLogo from t_bs_bank tbb inner join t_op_payBankRelation top on top.bankId =tbb.id inner join t_op_pay t on t.id = top.paymentId
+        ) B
+        on A.paymentId =B.BpaymentId left join t_op_pay C on A.paymentId=C.id
+    </select>
+    <select id="queryPayType" resultType="java.lang.String" parameterType="java.lang.String">
+        SELECT sbo.id from (SELECT sum(depositAmount) sumAmount ,onlinePayId from fund_deposit where status  <![CDATA[ <> ]]> 0 and createTime = #{createTime} GROUP BY onlinePayId  ) op
+        right join set_bacic_onlinePay sbo on op.onlinePayId =sbo.id and sbo.maxLimitDaily > op.sumAmount ORDER BY sbo.id
+    </select>
+</mapper>

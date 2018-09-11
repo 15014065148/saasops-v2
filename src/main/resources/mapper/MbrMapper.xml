@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="com.eveb.saasops.modules.member.mapper.MbrMapper">
+
+    <select id="queryMbrList"
+            resultType="com.eveb.saasops.modules.member.entity.MbrAccount"
+            parameterType="com.eveb.saasops.modules.member.entity.MbrAccount"
+    >
+        SELECT mbr.*
+        FROM mbr_account mbr
+        <include refid="mbr_where"/>
+    </select>
+
+    <sql id="mbr_where">
+        <where>
+            <if test="loginName != null and loginName != ''">
+                AND mbr.loginName LIKE CONCAT('%',#{loginName}, '%')
+            </if>
+            <if test="groupIds!=null">
+                AND mbr.groupId in
+                <foreach collection="groupIds" item="groupId" open="(" close=")" separator=",">
+                    #{groupId}
+                </foreach>
+            </if>
+            <if test="tagencyIds!=null">
+                AND mbr.tagencyId in
+                <foreach collection="tagencyIds" item="tagencyId" open="(" close=")" separator=",">
+                    #{tagencyId}
+                </foreach>
+            </if>
+            <if test="cagencyIds!=null">
+                AND mbr.cagencyId in
+                <foreach collection="cagencyIds" item="cagencyId" open="(" close=")" separator=",">
+                    #{cagencyId}
+                </foreach>
+            </if>
+        </where>
+    </sql>
+
+    <select id="findMbrAccount" resultType="com.eveb.saasops.modules.member.entity.MbrAccount">
+        SELECT * FROM mbr_account WHERE id =#{accountId}
+        <if test="registerStartTime != null and registerStartTime != ''">
+            AND registerTime <![CDATA[ >= ]]> #{registerStartTime}
+        </if>
+        <if test="registerStartEnd != null and registerStartEnd != ''">
+            AND registerTime <![CDATA[ <= ]]> #{registerStartEnd}
+        </if>
+    </select>
+
+    <select id="findAccountContact" resultType="java.lang.String">
+		SELECT GROUP_CONCAT(m.perms) FROM sys_user_role ur
+		LEFT JOIN sys_role_menu rm ON ur.role_id = rm.role_id
+		LEFT JOIN sys_menu m ON rm.menu_id = m.menu_id
+		WHERE ur.user_id =#{userId} AND m.perms like CONCAT('%',#{perms}, '%')
+	</select>
+
+    <update id="updateBankCardNameByAccId">
+		update mbr_bankcard set realName=#{realName} where accountId=#{accountId}
+	</update>
+
+    <select id="findAccountMenuByRoleId" resultType="com.eveb.saasops.modules.sys.entity.SysMenuEntity">
+		SELECT * FROM sys_menu where menu_id in (SELECT menu_id FROM sys_role_menu where role_id=#{roleId}) AND type = 1
+	</select>
+
+    <select id="findCollectList" resultType="com.eveb.saasops.modules.member.entity.MbrCollect">
+		SELECT ct.*,su.name,su.url FROM mbr_collect ct LEFT JOIN sys_menu su ON ct.menuId=su.menu_id
+		WHERE ct.userId = #{userId}  AND ct.menuId in (SELECT menu_id FROM sys_role_menu where role_id=#{roleId})
+	</select>
+    <select id="findFreeWalletSwitchStatus" resultType="integer">
+		select IFNULL(ma.freeWalletSwitch,0) from mbr_account ma where ma.id=#{accountId}
+	</select>
+
+</mapper>

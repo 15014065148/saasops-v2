@@ -1,0 +1,349 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="com.eveb.saasops.modules.operate.mapper.OperateActivityMapper">
+
+    <select id="findOprActActivityList" resultType="com.eveb.saasops.modules.operate.entity.OprActActivity"
+            parameterType="com.eveb.saasops.modules.operate.entity.OprActActivity">
+        SELECT acy.*,acl.tmplName,aat.catName,acl.tmplCode,
+        (SELECT count(*) FROM opr_act_bonus WHERE activityId=acy.id AND status=2) applyNum
+        FROM opr_act_activity acy
+        INNER JOIN t_op_acttmpl acl ON acy.actTmplId = acl.id
+        INNER JOIN opr_act_cat aat ON acy.actCatId = aat.id
+        <where>
+            <if test="activityName != null and activityName !=''">
+                AND acy.activityName like concat('%',#{activityName},'%')
+            </if>
+            <if test="actCatIdList != null and actCatIdList !='' ">
+                AND acy.actCatId in ( ${actCatIdList} )
+            </if>
+            <if test="actTmplIdList != null and actTmplIdList !='' ">
+                AND acy.actTmplId in ( ${actTmplIdList} )
+            </if>
+            <if test="useStateList != null and useStateList !='' ">
+                AND acy.useState in ( ${useStateList} )
+            </if>
+            <if test="useStart != null and useStart != ''">
+                AND acy.useStart <![CDATA[ >= ]]> #{useStart}
+            </if>
+            <if test="useEnd != null and useEnd != ''">
+                AND acy.useEnd <![CDATA[ <= ]]> #{useEnd}
+            </if>
+        </where>
+        ORDER BY acy.createTime DESC,FIELD(acy.available,1,0)
+    </select>
+
+    <select id="findOprActActivity" resultType="com.eveb.saasops.modules.operate.entity.OprActActivity">
+        SELECT act.*,re.rule,atl.tmplCode,re.id ruleId,atl.tmplName,atl.tmplNameTag FROM opr_act_activity act
+        INNER JOIN opr_act_rule re ON act.id = re.activityId
+        AND re.time = (SELECT MAX(time) FROM opr_act_rule WHERE activityId = re.activityId)
+        LEFT JOIN t_op_acttmpl atl ON atl.id = act.actTmplId
+        WHERE act.id = #{id}
+    </select>
+
+    <select id="findOprActBouns" resultType="java.lang.Integer"
+            parameterType="com.eveb.saasops.modules.operate.entity.OprActBonus">
+        SELECT count(*) FROM opr_act_bonus
+        <include refid="activity_where"/>
+    </select>
+
+
+    <sql id="activity_where">
+        <where>
+            <if test="isStatus == 1">
+                AND status != 0
+            </if>
+            <if test="activityId != null and activityId != ''">
+                AND activityId = #{activityId}
+            </if>
+            <if test="depositId != null and depositId != ''">
+                AND depositId = #{depositId}
+            </if>
+            <if test="accountId != null and accountId != ''">
+                AND accountId = #{accountId}
+            </if>
+            <if test="applicationTime != null and applicationTime != ''">
+                AND date_format(applicationTime,'%Y-%m-%d') = #{applicationTime}
+            </if>
+            <if test="startTime != null and startTime != ''">
+                AND date_format(applicationTime,'%Y-%m-%d') <![CDATA[ >= ]]> #{startTime}
+            </if>
+            <if test="endTime != null and endTime != ''">
+                AND date_format(applicationTime,'%Y-%m-%d') <![CDATA[ <= ]]> #{endTime}
+            </if>
+        </where>
+    </sql>
+
+    <select id="findGameList" parameterType="com.eveb.saasops.modules.operate.entity.TGmGame"
+            resultType="com.eveb.saasops.modules.operate.entity.TGmGame">
+        select * from t_gm_game
+        <where>
+            <if test="depotId !=null and depotId>0">
+                And depotId =#{depotId}
+            </if>
+            <if test="catId !=null and catId>0">
+                And catId =#{catId}
+            </if>
+            <if test="subCatId !=null and subCatId>0">
+                And subCatId =#{subCatId}
+            </if>
+        </where>
+    </select>
+    <select id="findWebActList" resultType="com.eveb.saasops.modules.operate.entity.OprActActivity">
+        <choose>
+            <when test="groupId != null and tagencyId != null and cagencyId !=null ">
+                select t1.*,t2.rule,t4.tmplCode,t2.id ruleId,t4.tmplName,t4.tmplNameTag, case t4.tmplCode when
+                'AQ0000005' then 0 when 'AQ0000010' then 0 when 'AQ0000002' then 1 WHEN 'AQ0000004' THEN 1 WHEN
+                'AQ0000006' THEN 1 when 'AQ0000001' then 1 when 'AQ0000003' then 1 else 3 end buttonShow from
+                opr_act_activity t1,opr_act_rule t2,opr_act_cat t3,t_op_acttmpl t4 where t1.id=t2.`activityId` AND
+                t1.`actCatId`=t3.id AND t3.id=#{actCatId} and t4.id=t1.actTmplId and t1.showstart&lt;=now()
+                and t1.showEnd&gt;=now() and t1.available=1
+                <if test="terminal==0">
+                    and t1.enablePc=1
+                </if>
+                <if test="terminal==1">
+                    and t1.enableMb=1
+                </if>
+                and t1.isShow=1 AND
+                (t2.rule ->'$.scopeDto.isAccAll' = TRUE OR(t2.rule ->'$.scopeDto.isAccAll' = FALSE AND
+                json_contains(t2.rule ->'$.scopeDto.accIds', concat('',#{groupId}))=1))
+                AND (t2.rule ->'$.scopeDto.isAgyTopAll' = TRUE OR(t2.rule ->'$.scopeDto.isAgyTopAll' = FALSE AND
+                json_contains(t2.rule ->'$.scopeDto.agyTopIds', concat('',#{tagencyId}))=1))
+                AND (t2.rule ->'$.scopeDto.isAgyAll' = TRUE OR(t2.rule ->'$.scopeDto.isAgyAll' = FALSE AND
+                json_contains(t2.rule ->'$.scopeDto.agyIds', concat('',#{cagencyId}))=1)) and
+                t2.time = (SELECT MAX(time) FROM opr_act_rule WHERE activityId = t2.activityId)
+            </when>
+            <otherwise>
+                select t1.*, t2.rule,t4.tmplCode,t2.id ruleId,t4.tmplName,t4.tmplNameTag, 0 buttonShow from
+                opr_act_activity t1,opr_act_rule t2,opr_act_cat t3,t_op_acttmpl t4 where t1.id=t2.`activityId` AND
+                t1.`actCatId`=t3.id AND t3.id=#{actCatId} and t4.id=t1.actTmplId and t1.showstart&lt;=now()
+                and t1.showEnd&gt;=now() and t1.available=1
+                <if test="terminal==0">
+                    and t1.enablePc=1
+                </if>
+                <if test="terminal==1">
+                    and t1.enableMb=1
+                </if>
+                and t1.isShow=1 AND t2.rule
+                ->'$.scopeDto.isAccAll' = TRUE AND t2.rule ->'$.scopeDto.isAgyTopAll' = TRUE AND t2.rule
+                ->'$.scopeDto.isAgyAll' = TRUE and t2.time = (SELECT MAX(time) FROM opr_act_rule WHERE activityId =
+                t2.activityId)
+            </otherwise>
+        </choose>
+    </select>
+
+    <select id="findWebDepositActList" resultType="com.eveb.saasops.modules.operate.entity.OprActActivity">
+        select t1.*,rule ->'$.activityRuleDtos' rule,t4.tmplCode,t2.id ruleId,t4.tmplName,t4.tmplNameTag, 0 buttonShow
+        from opr_act_activity
+        t1,opr_act_rule t2,opr_act_cat t3,t_op_acttmpl t4 where t1.id=t2.`activityId` AND
+        t1.`actCatId`=t3.id AND (t4.tmplCode='AQ0000001' or t4.tmplCode='AQ0000003') and t4.id=t1.actTmplId and
+        t1.showstart&lt;=now()
+        and t1.showEnd&gt;=now() and t1.available=1
+        <if test="terminal==0">
+            and t1.enablePc=1
+        </if>
+        <if test="terminal==1">
+            and t1.enableMb=1
+        </if>
+        and t1.isShow=1 AND
+        (t2.rule ->'$.scopeDto.isAccAll' = TRUE OR(t2.rule ->'$.scopeDto.isAccAll' = FALSE AND
+        json_contains(t2.rule ->'$.scopeDto.accIds', concat('',#{groupId}))=1))
+        AND (t2.rule ->'$.scopeDto.isAgyTopAll' = TRUE OR(t2.rule ->'$.scopeDto.isAgyTopAll' = FALSE AND
+        json_contains(t2.rule ->'$.scopeDto.agyTopIds', concat('',#{tagencyId}))=1))
+        AND (t2.rule ->'$.scopeDto.isAgyAll' = TRUE OR(t2.rule ->'$.scopeDto.isAgyAll' = FALSE AND
+        json_contains(t2.rule ->'$.scopeDto.agyIds', concat('',#{cagencyId}))=1)) and
+        t2.time = (SELECT MAX(time) FROM opr_act_rule WHERE activityId = t2.activityId)
+    </select>
+
+    <select id="findWaterBonusList" resultType="com.eveb.saasops.modules.operate.entity.OprActBonus"
+            parameterType="com.eveb.saasops.modules.operate.entity.OprActBonus">
+        SELECT ws.*,
+        mr.registerTime,mr.registerIp,tl.tmplCode,tl.tmplName,ay.activityName,agy.agyAccount,agy1.agyAccount
+        generalAccount,
+        (SELECT oac.catName FROM opr_act_cat oac WHERE oac.id = ay.actCatId) catName,
+        (SELECT groupName FROM mbr_group mg WHERE mg.id=mt.groupId) groupName,
+        (SELECT count(*) FROM mbr_account WHERE realName = mt.realName) realNameCount,
+        (SELECT count(*) FROM log_mbrregister WHERE registerIp = mr.registerIp) registerIpCount,ay.useState
+        FROM opr_act_bonus ws
+        LEFT JOIN opr_act_activity ay ON ws.activityId = ay.id
+        LEFT JOIN t_op_acttmpl tl ON ay.actTmplId = tl.id
+        LEFT JOIN mbr_account mt ON ws.accountId = mt.id
+        LEFT JOIN log_mbrregister mr ON mt.id = mr.accountId
+        LEFT JOIN agy_account agy ON agy.id = mt.cagencyId
+        LEFT JOIN agy_account agy1 ON agy.parentId = agy1.id
+        <where>
+            <if test="startTime != null and startTime != ''">
+                AND ws.applicationTime <![CDATA[ >= ]]>#{startTime}
+            </if>
+            <if test="endTime != null and endTime != ''">
+                AND ws.applicationTime <![CDATA[ <= ]]>#{endTime}
+            </if>
+            <if test="auditTimeFrom != null and auditTimeFrom != ''">
+                AND ws.auditTime <![CDATA[ >= ]]>#{auditTimeFrom}
+            </if>
+            <if test="auditTimeTo != null and auditTimeTo != ''">
+                AND ws.auditTime <![CDATA[ <= ]]>#{auditTimeTo}
+            </if>
+            <if test="loginName != null and loginName !=''">
+                AND ws.loginName like concat('%',#{loginName},'%')
+            </if>
+            <if test="tagencyIds != null and tagencyIds.size()>0">
+                AND tagencyId in
+                <foreach item="tagencyId" collection="tagencyIds" open="(" separator="," close=")">
+                    #{tagencyId}
+                </foreach>
+            </if>
+
+            <if test="cagencyIds != null and cagencyIds.size()>0">
+                AND cagencyId in
+                <foreach item="cagencyId" collection="cagencyIds" open="(" separator="," close=")">
+                    #{cagencyId}
+                </foreach>
+            </if>
+
+            <if test="actTmplIds != null and actTmplIds.size()>0">
+                AND actTmplId in
+                <foreach item="actTmplId" collection="actTmplIds" open="(" separator="," close=")">
+                    #{actTmplId}
+                </foreach>
+            </if>
+
+            <if test="activityIds != null and activityIds.size()>0">
+                AND activityId in
+                <foreach item="activityId" collection="activityIds" open="(" separator="," close=")">
+                    #{activityId}
+                </foreach>
+            </if>
+            <if test="statuss != null and statuss.size()>0">
+                AND status in
+                <foreach item="status" collection="statuss" open="(" separator="," close=")">
+                    #{status}
+                </foreach>
+            </if>
+            <if test="devSourceList != null and devSourceList != ''">
+                AND ws.devSource in (${devSourceList})
+            </if>
+        </where>
+        order by ws.applicationTime desc
+    </select>
+
+    <select id="findAccountBonusList" resultType="com.eveb.saasops.modules.operate.entity.OprActBonus"
+            parameterType="com.eveb.saasops.modules.operate.entity.OprActBonus">
+        SELECT t.* FROM (
+        SELECT bonus.bonusAmount,bonus.applicationTime,bonus.`status`,
+        acttmpl.tmplName,bonus.memo,bonus.orderNo,bonus.auditUser,
+        IFNULL(bonus.transferAmount,0) transferAmount
+        FROM opr_act_bonus bonus
+        LEFT JOIN opr_act_activity activity ON bonus.activityId = activity.id
+        LEFT JOIN t_op_acttmpl acttmpl ON activity.actTmplId = acttmpl.id
+        WHERE bonus.accountId=#{accountId}
+        <if test="status != null and status != ''">
+            AND bonus.status =#{status}
+        </if>
+        <if test="startTime != null and startTime != ''">
+            AND bonus.applicationTime <![CDATA[ >= ]]>#{startTime}
+        </if>
+        <if test="endTime != null and endTime != ''">
+            AND bonus.applicationTime <![CDATA[ <= ]]>#{endTime}
+        </if>
+        UNION ALL
+        SELECT audit.amount bonusAmount,audit.createTime applicationTime,
+        audit.status status,acttmpl.tmplName,audit.memo,audit.orderNo,audit.auditUser,
+        0 transferAmount
+        FROM fund_audit audit
+        LEFT JOIN opr_act_activity activity ON audit.activityId = activity.id
+        LEFT JOIN t_op_acttmpl acttmpl ON activity.actTmplId = acttmpl.id
+        WHERE audit.accountId=#{accountId} AND audit.financialCode = #{financialCode}
+        AND audit.depositType = 2
+        <if test="startTime != null and startTime != ''">
+            AND audit.createTime <![CDATA[ >= ]]>#{startTime}
+        </if>
+        <if test="endTime != null and endTime != ''">
+            AND audit.createTime <![CDATA[ <= ]]>#{endTime}
+        </if>
+        ) t ORDER BY t.applicationTime DESC
+    </select>
+
+    <select id="findBounsCount" resultType="java.lang.Integer"
+            parameterType="com.eveb.saasops.modules.operate.entity.OprActBonus">
+        SELECT count(*) FROM opr_act_bonus bonus
+        LEFT JOIN opr_act_activity activity ON bonus.activityId = activity.id
+        <where>
+            AND bonus.status != 0
+            <if test="accountId != null and accountId != ''">
+                AND bonus.accountId =#{accountId}
+            </if>
+            <if test="activityId != null and activityId != ''">
+                AND bonus.activityId =#{activityId}
+            </if>
+            <if test="applicationTime != null and applicationTime != ''">
+                AND DATE_FORMAT(bonus.applicationTime,'%Y-%m-%d') =#{applicationTime}
+            </if>
+            <if test="startTime != null and startTime != ''">
+                AND DATE_FORMAT(bonus.applicationTime,'%Y-%m-%d') <![CDATA[ >= ]]>#{startTime}
+            </if>
+            <if test="endTime != null and endTime != ''">
+                AND DATE_FORMAT(bonus.applicationTime,'%Y-%m-%d') <![CDATA[ <= ]]>#{endTime}
+            </if>
+        </where>
+    </select>
+
+    <select id="findActivityBySatatus" resultType="com.eveb.saasops.modules.operate.entity.OprActActivity">
+        SELECT * FROM opr_act_activity WHERE useState !=2
+    </select>
+
+    <select id="listActivity" resultType="com.eveb.saasops.modules.operate.entity.OprActActivity">
+        SELECT * FROM opr_act_activity
+        <where>
+            <if test=" actTmplIds !=null and actTmplIds != '' ">
+                and actTmplId in ( ${actTmplIds} )
+            </if>
+        </where>
+    </select>
+
+    <select id="findAccountBouns" resultType="com.eveb.saasops.modules.operate.dto.BonusListDto">
+        SELECT bs.id,bs.STATUS,ay.useEnd,ay.activityName,acl.tmplName,bs.bonusAmount,bs.ruleId,acl.tmplCode,ay.id
+        activityId,
+        bs.discountAudit
+        FROM opr_act_bonus bs
+        LEFT JOIN opr_act_activity ay ON bs.activityId = ay.id
+        LEFT JOIN t_op_acttmpl acl ON ay.actTmplId = acl.id
+        <where>
+            <if test="accountId !=null and accountId != '' ">
+                AND bs.accountId =#{accountId}
+            </if>
+            <if test="id !=null">
+                AND bs.id =#{id}
+            </if>
+            <if test="status !=null">
+                AND bs.status =#{status}
+            </if>
+            AND acl.tmplCode in ('AQ0000001','AQ0000003','AQ0000002')
+        </where>
+        ORDER BY FIELD(bs. STATUS, 3, 2, 0, 4, 1)
+    </select>
+
+    <select id="findAccountBounsByStatus" resultType="com.eveb.saasops.modules.operate.entity.OprActBonus">
+        SELECT bs.*,ay.useState FROM opr_act_bonus bs
+        LEFT JOIN opr_act_activity ay ON bs.activityId = ay.id
+        LEFT JOIN t_op_acttmpl acl ON ay.actTmplId = acl.id
+        WHERE bs.accountId =#{accountId}
+        AND bs.status IN (2,3)
+        AND ay.useState = 2
+        AND acl.tmplCode in ('AQ0000001','AQ0000003','AQ0000002')
+        <if test="id !=null">
+            AND bs.id =#{id}
+        </if>
+    </select>
+
+    <select id="findDepotByCatId" resultType="com.eveb.saasops.modules.operate.entity.TGmDepot">
+        SELECT dt.* FROM t_gm_depot dt
+        LEFT JOIN t_gm_depotcat dcat ON dt.id = dcat.depotId
+        WHERE dcat.catId = #{catId}
+    </select>
+
+    <update id="updateBounsState">
+         UPDATE opr_act_bonus SET status=#{status} WHERE activityId =#{activityId} AND (status=2 or status=3)
+    </update>
+
+</mapper>

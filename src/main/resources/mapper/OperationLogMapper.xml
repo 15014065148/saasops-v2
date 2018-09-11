@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.eveb.saasops.modules.log.dao.OperationLogMapper">
+	<insert id="insertRecord">
+		INSERT INTO
+			operation_log 
+			( ops_user,
+			ops_time,
+			ops_class,
+			ops_method,
+			ops_parameters,
+			ops_status,
+			ops_ip,
+			tml_device,
+			exception_info)
+		 VALUES
+		 	(#{opsUser},
+		 	 #{opsTime},
+		 	 #{opsClass},
+		 	 #{opsMethod},
+		 	 #{opsParameters},
+		 	 #{opsStatus},
+		 	 #{opsIp},
+		 	 #{tmlDevice},
+		     #{exceptionInfo})
+	</insert>
+	
+</mapper>

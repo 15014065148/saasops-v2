@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="com.eveb.saasops.modules.log.mapper.LogMapper">
+    <select id="findMemberLoginLastOne" resultType="com.eveb.saasops.modules.log.entity.LogMbrLogin"
+            parameterType="java.lang.String">
+		select * from log_mbrlogin where loginName=#{loginName}
+		order by loginTime
+		desc limit 1
+	</select>
+    <delete id="deleteMbrLoginBatch" parameterType="String">
+        DELETE log_mbrlogin where id in
+        <foreach item="id" index="index" collection="array" open="("
+                 separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+    <delete id="deleteMbrRegBatch" parameterType="String">
+        DELETE log_mbrregister where id in
+        <foreach item="id" index="index" collection="array" open="("
+                 separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+    <delete id="deleteSystemBatch" parameterType="String">
+        DELETE log_system where id in
+        <foreach item="id" index="index" collection="array" open="("
+                 separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+    <update id="updateLoginTime" parameterType="Integer">
+		update log_mbrlogin set logoutTime=now(),onlineTime=TIMESTAMPDIFF(SECOND,loginTime,now()) where id=#{id}
+	</update>
+
+</mapper>

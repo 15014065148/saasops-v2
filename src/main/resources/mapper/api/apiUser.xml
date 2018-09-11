@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.eveb.saasops.api.modules.user.mapper.ApiUserMapper">
+	<!-- <select id="findPwdOne"
+		resultType="com.eveb.saasops.api.modules.user.entity.FindPwEntity">
+		select * from mbr_findPw where loginName=#{loginName} order
+		by applyTime desc limit 1
+	</select> -->
+	<insert id="insertFindPwd" parameterType="com.eveb.saasops.api.modules.user.entity.FindPwEntity">
+		insert into mbr_retrvpw(`loginName`,`vaildCode`,`expire`,`applyTime`,`vaildTimes`,`vaildType`) values
+		(#{loginName}, #{vaildCode}, #{expire}, #{applyTime}, #{vaildTimes},#{vaildType}) on duplicate key update
+		vaildCode=values(vaildCode),expire=values(expire),applyTime=values(applyTime),vaildTimes=values(vaildTimes),vaildType=values(vaildType)
+	</insert>
+
+</mapper>

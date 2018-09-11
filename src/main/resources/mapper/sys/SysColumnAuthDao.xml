@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.eveb.saasops.modules.sys.dao.SysColumnAuthDao">
+
+	<resultMap id="LscrmFunctionPrivilegeResult" type="com.eveb.saasops.modules.sys.dto.ColumnAuthTreeDto">
+		<id column="menu_id" property="menuId"></id>
+        <result column="parent_id" property="parentId"></result>
+        <result column="name" property="name"></result>
+        <result column="type" property="type"></result>
+        <result column="order_num" property="orderNum"></result>
+        <result column="columnName" property="columnName"></result>
+        <result column="columnKey" property="columnKey"></result>
+        <result column="operate" property="operate"></result>
+    </resultMap>
+
+    <resultMap id="SubPrivilegesResult" type="com.eveb.saasops.modules.sys.dto.ColumnAuthTreeDto" extends="LscrmFunctionPrivilegeResult">
+        <collection property="childList" javaType="java.util.ArrayList" column="menu_id"
+                    ofType="com.eveb.saasops.modules.sys.dto.ColumnAuthTreeDto" select="selectSubPrivileges"></collection>
+    </resultMap>
+
+    <resultMap id="LscrmFunctionPrivilegeTreeResult" type="com.eveb.saasops.modules.sys.dto.ColumnAuthTreeDto"
+               extends="SubPrivilegesResult">
+        <collection property="childList" javaType="java.util.ArrayList" column="menu_id"
+                    ofType="com.eveb.saasops.modules.sys.dto.ColumnAuthTreeDto" select="selectSubPrivileges"></collection>
+    </resultMap>
+
+    <sql id="select_sql">
+        select menu_id, 
+        	   parent_id, 
+        	   name, 
+        	   type, 
+        	   order_num, 
+        	   columnName,
+        	   columnKey,
+        	   operate 
+        from sys_menu 
+    </sql>
+
+    <select id="getColumnAuth" resultMap="LscrmFunctionPrivilegeTreeResult">
+        <include refid="select_sql"/>
+        WHERE parent_id = #{parentId} 
+          and type=#{type}
+    </select>
+
+    <select id="selectSubPrivileges" resultMap="SubPrivilegesResult">
+        <include refid="select_sql"/>
+        WHERE parent_id = #{menu_id} 
+          <!-- and type=#{type}  -->
+    </select>
+    
+    <select id="getRoleColumnAuth" resultType="com.eveb.saasops.modules.sys.dto.ColumnAuthTreeDto">
+    	select t.menu_id, 
+        	   t.parent_id, 
+        	   t.name, 
+        	   t.type, 
+        	   t.columnName,
+        	   t.columnKey,
+        	   t.operate 
+        from sys_menu t, sys_role_menu m 
+        where t.menu_id = m.menu_id 
+          and t.type=#{type} 
+          and m.role_id = #{roleId}
+          and t.parent_id = #{menuId}
+    </select>
+    
+    <select id="getRoleAuth" resultType="com.eveb.saasops.modules.sys.dto.ColumnAuthTreeDto">
+    	select t.menu_id, 
+        	   t.parent_id, 
+        	   t.name, 
+        	   t.type, 
+        	   t.columnName,
+        	   t.columnKey,
+        	   t.operate from sys_role_menu r,
+							sys_menu t 
+		 where r.menu_id = t.menu_id 
+		   and r.role_id=#{roleId}
+		   <if test="paramList != null and paramList.size()>0">
+                and t.menu_id in
+                <foreach collection="paramList" open="(" close=")" separator="," item="itemId">
+                    #{itemId}
+                </foreach>
+            </if>
+    </select>
+    
+    
+</mapper>

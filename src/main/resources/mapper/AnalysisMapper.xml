@@ -1,0 +1,1181 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="com.eveb.saasops.modules.analysis.mapper.AnalysisMapper">
+
+    <sql id="gameTableSql">
+        (select tb1.depotName as platform,tb1.depotId,tb2.catName,tb2.id as catId,tb1.gameCode as codeid,tb1.gameName as codename from
+        (select id,depotId,depotName,catId,gameCode,gameName from t_gm_game where available=1 and gameCode !=''
+        union select id,depotId,depotName,catId,mbGameCode,gameName from t_gm_game where available=1  and mbGameCode !=''
+        union select id,depotId,depotName,catId,adGameCode,gameName from t_gm_game where available=1  and adGameCode !=''
+        union select id,depotId,depotName,catId,downGameCode,gameName from t_gm_game where available=1  and downGameCode !=''
+        union select id,depotId,depotName,catId,embeddedCode,gameName from t_gm_game where available=1  and embeddedCode !=''
+        union select id,depotId,depotName,catId,embeddedCode1,gameName from t_gm_game where available=1 and embeddedCode1 !='')tb1,t_gm_cat tb2 where tb1.catId=tb2.id)
+    </sql>
+
+    <sql id="joinUserAndAgentTableSql_Loginname">
+        LEFT JOIN mbr_account mbr on tb.username=mbr.loginName
+        LEFT JOIN mbr_group g on mbr.groupId=g.id
+        LEFT JOIN (select * from agy_account where parentId=0) tagt on mbr.tagencyId=tagt.id
+        LEFT JOIN agy_account agt on mbr.cagencyId=agt.id
+    </sql>
+
+    <sql id="gameTableSql_Single">
+        (select id,depotId,catId,subCatId,depotName,gameCode,gameName from t_gm_game where available=1 and gameCode !=''
+        union select id,depotId,catId,subCatId,depotName,mbGameCode,gameName from t_gm_game where available=1  and mbGameCode !=''
+        union select id,depotId,catId,subCatId,depotName,adGameCode,gameName from t_gm_game where available=1  and adGameCode !=''
+        union select id,depotId,catId,subCatId,depotName,downGameCode,gameName from t_gm_game where available=1  and downGameCode !=''
+        union select id,depotId,catId,subCatId,depotName,embeddedCode,gameName from t_gm_game where available=1  and embeddedCode !=''
+        union select id,depotId,catId,subCatId,depotName,embeddedCode1,gameName from t_gm_game where available=1 and embeddedCode1 !='')
+    </sql>
+
+    <select id="getGameList" resultType="com.eveb.saasops.modules.operate.entity.TGmGame">
+        select t.platform as depotName,t.codeid as gameCode,t.catName from <include refid="gameTableSql"/> t where
+        1=1
+        <if test="platFormNames!=null">
+            AND t.platform in
+            <foreach collection="platFormNames" item="pf" open="(" close=")" separator=",">
+                #{pf}
+            </foreach>
+        </if>
+    </select>
+
+    <select id="getPlatForm"  resultType="com.eveb.saasops.modules.analysis.entity.SelectModel">
+		select a.depotCode as `key`,a.memo as `value` from t_gm_depot a
+        where a.available=1
+	</select>
+
+    <select id="getGameType" parameterType="String"  resultType="com.eveb.saasops.modules.analysis.entity.SelectModel">
+        select c.id as `key`,c.catName as `value` from t_gm_depot d
+        LEFT JOIN t_gm_depotcat dc on d.id=dc.depotId
+        LEFT JOIN t_gm_cat c on dc.catId=c.id
+        where d.depotCode=#{platFormId}
+        <if test=" parentId !=null">
+            and c.parentId=#{parentId}
+        </if>
+    </select>
+
+    <select id="getGameCodeByCategory" parameterType="map" resultType="com.eveb.saasops.modules.operate.entity.TGmGame">
+        select DISTINCT g.* from t_gm_cat c
+        LEFT JOIN t_gm_depotcat dc on c.id=dc.catId
+        LEFT JOIN t_gm_depot d on dc.depotId=d.id
+        LEFT JOIN <include refid="gameTableSql_Single"/> g on g.catId=c.id
+        where 1=1
+        <if test=" platFormName !=null and platFormName!=''">
+            And g.depotName=#{platFormName}
+        </if>
+        <if test=" cid !=null and cid!=''">
+            And c.id=#{cid}
+        </if>
+        <if test=" gameName !=null and gameName!=''">
+            And g.gameName like CONCAT('%',#{gameName}, '%')
+        </if>
+    </select>
+
+    <select id="getAgentAccount"  resultType="java.util.Map">
+		select a.id as parentId,a.agyAccount as parentName,b.id,b.agyAccount from agy_account a left  JOIN agy_account b on a.id=b.parentId
+		where a.parentId=0
+	</select>
+
+    <select id="getRptBetDay" resultType="com.eveb.saasops.modules.analysis.entity.RptBetDayModel">
+        select
+        <if test=" group_head ==null or group_head ==''">
+            a.*
+        </if>
+        <if test=" group_head !=null and group_head !='' ">
+            ${group_head},sum(bet) bet,sum(validbet) validbet,sum(payout) payout,sum(payoff) payoff,sum(payoffbet) payoffbet,sum(winnings) winnings,sum(tip) tip,sum(deposit) deposit,
+            sum(withdrawal) withdrawal,sum(rebate) rebate,sum(quantity) quantity,count(username) counts
+        </if>
+        from rpt_bet_rcd_day a
+        LEFT JOIN mbr_account mbr on a.username=mbr.loginName
+        LEFT JOIN mbr_group gro on mbr.groupId=gro.id
+        LEFT JOIN (select * from agy_account where parentId=0) topagt on mbr.tagencyId=topagt.id
+        LEFT JOIN agy_account agt on mbr.cagencyId=agt.id
+        left join t_gm_game gm on a.gametype=gm.gameCode
+        left join t_gm_cat c on gm.catId=c.id
+        where 1=1
+        <if test=" parentAgentid !=null and parentAgentid >0 ">
+            And topagt.id=#{parentAgentid}
+        </if>
+        <if test=" agentid !=null and agentid >0 ">
+            And agt.id=#{agentid}
+        </if>
+        <if test=" groupid !=null and groupid >0 ">
+            And mbr.groupId=#{groupid}
+        </if>
+        <if test=" loginName !=null and loginName !='' ">
+            And mbr.loginName like CONCAT('%',#{loginName}, '%')
+        </if>
+        <if test=" platform !=null and platform !='' ">
+            And a.platform=#{platform}
+        </if>
+        <if test=" gametype !=null and gametype !='' ">
+            And a.gametype=#{gametype}
+        </if>
+        <if test=" betStrTime !=null and betStrTime !='' ">
+            And a.startday &gt;=DATE_FORMAT(#{betStrTime},'%Y-%m-%d')
+        </if>
+        <if test=" betEndTime !=null and betEndTime !='' ">
+            And a.startday &lt;= DATE_FORMAT(#{betEndTime},'%Y-%m-%d')
+        </if>
+        <if test=" groups !=null and groups !='' ">
+            group by ${groups}
+        </if>
+        order by startday desc
+    </select>
+
+    <select id="getFundStatistics" resultType="com.eveb.saasops.modules.analysis.entity.FundStatisticsModel">
+        select date,sum(deposit) deposit,sum(profit) profit,sum(withdraw) withdraw,sum(payout) payout from (
+        select DATE_FORMAT(deposit.createTime,'%Y-%m-%d') date,sum(deposit.depositAmount) deposit,sum(bonus.bonusAmount) profit,0 as withdraw,0 as payout
+        from fund_deposit deposit LEFT JOIN mbr_account mbr on deposit.accountId=mbr.id
+        LEFT JOIN mbr_group gro on mbr.groupId=gro.id
+        LEFT JOIN (select * from agy_account where parentId=0) topagt on mbr.tagencyId=topagt.id
+        LEFT JOIN agy_account agt on mbr.cagencyId=agt.id
+        LEFT JOIN opr_act_bonus bonus on bonus.depositId=deposit.id
+        where deposit.`status`=1
+        and bonus.`status`=1
+        <if test=" parentAgentid !=null and parentAgentid >0 ">
+            And topagt.id=#{parentAgentid}
+        </if>
+        <if test=" agentid !=null and agentid >0 ">
+            And agt.id=#{agentid}
+        </if>
+        <if test=" groupid !=null and groupid >0 ">
+            And mbr.groupId=#{groupid}
+        </if>
+        <if test=" loginName !=null and loginName !='' ">
+            And mbr.loginName like CONCAT('%',#{loginName}, '%')
+        </if>
+        <if test=" betStrTime !=null and betStrTime !='' ">
+            And deposit.createTime &gt;= #{betStrTime}
+        </if>
+        <if test=" betEndTime !=null and betEndTime !='' ">
+            And deposit.createTime &lt;= #{betEndTime}
+        </if>
+        GROUP BY DATE_FORMAT(deposit.createTime,'%Y-%m-%d')
+        UNION all
+        select DATE_FORMAT(withdraw.createTime,'%Y-%m-%d') date,0 as deposit,0 as profit,sum(withdraw.actualArrival) as withdraw,0 as payout
+        from fund_acc_withdraw withdraw LEFT JOIN mbr_account mbr on withdraw.accountId=mbr.id
+        LEFT JOIN mbr_group gro on mbr.groupId=gro.id
+        LEFT JOIN (select * from agy_account where parentId=0) topagt on mbr.tagencyId=topagt.id
+        LEFT JOIN agy_account agt on mbr.cagencyId=agt.id
+        where withdraw.`status`=1
+        <if test=" parentAgentid !=null and parentAgentid >0 ">
+            And topagt.id=#{parentAgentid}
+        </if>
+        <if test=" agentid !=null and agentid >0 ">
+            And agt.id=#{agentid}
+        </if>
+        <if test=" groupid !=null and groupid >0 ">
+            And mbr.groupId=#{groupid}
+        </if>
+        <if test=" loginName !=null and loginName !='' ">
+            And mbr.loginName like CONCAT('%',#{loginName}, '%')
+        </if>
+        <if test=" betStrTime !=null and betStrTime !='' ">
+            And withdraw.createTime &gt;= #{betStrTime}
+        </if>
+        <if test=" betEndTime !=null and betEndTime !='' ">
+            And withdraw.createTime &lt;= #{betEndTime}
+        </if>
+        GROUP BY DATE_FORMAT(withdraw.createTime,'%Y-%m-%d')
+        union ALL
+        select a.startday date,0 as deposit,0 as profit,0 as withdraw,sum(a.payout) as payout
+        from rpt_bet_rcd_day a LEFT JOIN mbr_account mbr on a.username=mbr.loginName
+        LEFT JOIN mbr_group gro on mbr.groupId=gro.id
+        LEFT JOIN (select * from agy_account where parentId=0) topagt on mbr.tagencyId=topagt.id
+        LEFT JOIN agy_account agt on mbr.cagencyId=agt.id
+        WHERE 1=1
+        <if test=" parentAgentid !=null and parentAgentid >0 ">
+            And topagt.id=#{parentAgentid}
+        </if>
+        <if test=" agentid !=null and agentid >0 ">
+            And agt.id=#{agentid}
+        </if>
+        <if test=" groupid !=null and groupid >0 ">
+            And mbr.groupId=#{groupid}
+        </if>
+        <if test=" loginName !=null and loginName !='' ">
+            And mbr.loginName like CONCAT('%',#{loginName}, '%')
+        </if>
+        <if test=" platform !=null and platform !='' ">
+            And a.platform=#{platform}
+        </if>
+        <if test=" gametype !=null and gametype !='' ">
+            And a.gametype=#{gametype}
+        </if>
+        <if test=" betStrTime !=null and betStrTime !='' ">
+            And a.startday &gt;=DATE_FORMAT(#{betStrTime},'%Y-%m-%d')
+        </if>
+        <if test=" betEndTime !=null and betEndTime !='' ">
+            And a.startday &lt;=DATE_FORMAT(#{betEndTime},'%Y-%m-%d')
+        </if>
+        GROUP BY a.startday
+        ) t
+        GROUP BY date
+        order by date desc;
+    </select>
+
+    <select id="getFundReport" resultType="com.eveb.saasops.modules.analysis.entity.FundReportModel">
+        select sum(payout) as payout,sum(discount) as discount,sum(withdraw) as memberWithdraw,sum(agy_withdraw) as agyWithdraw,sum(commission) as commission
+        ,sum(payout)+sum(discount)+sum(withdraw)+sum(agy_withdraw)+sum(commission) as profit
+        from (
+        select sum(a.payout) payout,0 discount,0 withdraw,0 agy_withdraw,0 commission
+        from rpt_bet_rcd_day a
+        LEFT JOIN mbr_account mbr on a.username=mbr.loginName
+        LEFT JOIN mbr_group gro on mbr.groupId=gro.id
+        LEFT JOIN (select * from agy_account where parentId=0) topagt on mbr.tagencyId=topagt.id
+        LEFT JOIN agy_account agt on mbr.cagencyId=agt.id
+        WHERE 1=1
+        <if test=" parentAgentid !=null and parentAgentid >0 ">
+            And topagt.id=#{parentAgentid}
+        </if>
+        <if test=" agentid !=null and agentid >0 ">
+            And agt.id=#{agentid}
+        </if>
+        <if test=" groupid !=null and groupid >0 ">
+            And mbr.groupId=#{groupid}
+        </if>
+        <if test=" betStrTime !=null and betStrTime !='' ">
+            And a.startday &gt;=DATE_FORMAT(#{betStrTime},'%Y-%m-%d')
+        </if>
+        <if test=" betEndTime !=null and betEndTime !='' ">
+            And a.startday &lt;=DATE_FORMAT(#{betEndTime},'%Y-%m-%d')
+        </if>
+        UNION all
+        select 0,sum(bonus.bonusAmount),0,0,0
+        from fund_deposit deposit
+        LEFT JOIN mbr_account mbr on deposit.accountId=mbr.id
+        LEFT JOIN mbr_group gro on mbr.groupId=gro.id
+        LEFT JOIN (select * from agy_account where parentId=0) topagt on mbr.tagencyId=topagt.id
+        LEFT JOIN agy_account agt on mbr.cagencyId=agt.id
+        LEFT JOIN opr_act_bonus bonus on bonus.depositId=deposit.id
+        where deposit.`status`=1
+        and bonus.`status`=1
+        <if test=" parentAgentid !=null and parentAgentid >0 ">
+            And topagt.id=#{parentAgentid}
+        </if>
+        <if test=" agentid !=null and agentid >0 ">
+            And agt.id=#{agentid}
+        </if>
+        <if test=" groupid !=null and groupid >0 ">
+            And mbr.groupId=#{groupid}
+        </if>
+        <if test=" betStrTime !=null and betStrTime !='' ">
+            And deposit.createTime &lt;= #{betStrTime}
+        </if>
+        <if test=" betEndTime !=null and betEndTime !='' ">
+            And deposit.createTime &gt;= #{betEndTime}
+        </if>
+        union ALL
+        select 0,0,sum(withdraw.actualArrival),0,0  from fund_acc_withdraw
+        withdraw LEFT JOIN mbr_account mbr on withdraw.accountId=mbr.id
+        LEFT JOIN mbr_group gro on mbr.groupId=gro.id
+        LEFT JOIN (select * from agy_account where parentId=0) topagt on mbr.tagencyId=topagt.id
+        LEFT JOIN agy_account agt on mbr.cagencyId=agt.id
+        where withdraw.`status`=1
+        <if test=" parentAgentid !=null and parentAgentid >0 ">
+            And topagt.id=#{parentAgentid}
+        </if>
+        <if test=" agentid !=null and agentid >0 ">
+            And agt.id=#{agentid}
+        </if>
+        <if test=" groupid !=null and groupid >0 ">
+            And mbr.groupId=#{groupid}
+        </if>
+        <if test=" betStrTime !=null and betStrTime !='' ">
+            And withdraw.createTime &lt;= #{betStrTime}
+        </if>
+        <if test=" betEndTime !=null and betEndTime !='' ">
+            And withdraw.createTime &gt;= #{betEndTime}
+        </if>
+        union all
+        select 0,0,0,sum(agywithdraw.actualArrival) as withdraw,0 from fund_agy_withdraw agywithdraw
+        LEFT JOIN mbr_account mbr on agywithdraw.accountId=mbr.id
+        LEFT JOIN mbr_group gro on mbr.groupId=gro.id
+        LEFT JOIN (select * from agy_account where parentId=0) topagt on mbr.tagencyId=topagt.id
+        LEFT JOIN agy_account agt on mbr.cagencyId=agt.id
+        where agywithdraw.`status`=1
+        <if test=" parentAgentid !=null and parentAgentid >0 ">
+            And topagt.id=#{parentAgentid}
+        </if>
+        <if test=" agentid !=null and agentid >0 ">
+            And agt.id=#{agentid}
+        </if>
+        <if test=" groupid !=null and groupid >0 ">
+            And mbr.groupId=#{groupid}
+        </if>
+        <if test=" betStrTime !=null and betStrTime !='' ">
+            And agywithdraw.createTime &lt;= #{betStrTime}
+        </if>
+        <if test=" betEndTime !=null and betEndTime !='' ">
+            And agywithdraw.createTime &gt;= #{betEndTime}
+        </if>
+        UNION ALL
+        select 0,0,0,0,0 from dual
+        ) t
+    </select>
+
+    <select id="getRptWinLostList" resultType="com.eveb.saasops.modules.analysis.entity.RptWinLostModel" parameterType="com.eveb.saasops.modules.analysis.entity.WinLostReportModel">
+        select startday,sum(betCounts) betCounts,sum(depositCounts) depositCounts,sum(deposit) deposits,sum(withdraw) withdraws,sum(profit) profits,sum(deposit)- sum(withdraw) earnings from (
+        select a.startday,count(distinct(a.username)) betCounts,0 depositCounts,0 deposit,0 withdraw,0 profit
+        from
+        rpt_bet_rcd_day a where 1=1
+        <if test=" betStrTime !=null and betStrTime !='' ">
+            And a.startday &gt;=DATE_FORMAT(#{betStrTime},'%Y-%m-%d')
+        </if>
+        <if test=" betEndTime !=null and betEndTime !='' ">
+            And a.startday &lt;=DATE_FORMAT(#{betEndTime},'%Y-%m-%d')
+        </if>
+        GROUP BY a.startday
+        union
+        select DATE_FORMAT(tb.createTime,'%Y-%m-%d') date,0 betCounts ,count(distinct(tb.accountId))
+        depositCounts,sum(tb.depositAmount) deposit,0 as withdraw,0 profit
+        from fund_deposit tb LEFT JOIN mbr_account mbr on tb.accountId=mbr.id
+        where tb.`status`=1
+        <include refid="createTimeWhere"/>
+        GROUP BY DATE_FORMAT(tb.createTime,'%Y-%m-%d')
+        union
+        select DATE_FORMAT(tb.createTime,'%Y-%m-%d') date,0,0,0 as deposit,sum(tb.actualArrival) as withdraw,0 as profit
+        from fund_acc_withdraw tb LEFT JOIN mbr_account mbr on tb.accountId=mbr.id
+        where tb.`status`=1
+        <include refid="createTimeWhere"/>
+        GROUP BY DATE_FORMAT(tb.createTime,'%Y-%m-%d')
+        union
+        select DATE_FORMAT(tb.applicationTime,'%Y-%m-%d') date,0,0,0,0,sum(tb.bonusAmount) profit
+        from opr_act_bonus tb
+        where tb.`status`=1
+        <if test=" betStrTime !=null and betStrTime !='' ">
+            And tb.applicationTime &gt;= #{betStrTime}
+        </if>
+        <if test=" betEndTime !=null and betEndTime !='' ">
+            And tb.applicationTime &lt;= #{betEndTime}
+        </if>
+        GROUP BY
+        DATE_FORMAT(tb.applicationTime, '%Y-%m-%d')
+        ) t
+        GROUP BY startday
+        ORDER BY 1 desc
+    </select>
+
+    <select id="getRptWinLostTotal" resultType="com.eveb.saasops.modules.analysis.entity.RptWinLostModel" parameterType="com.eveb.saasops.modules.analysis.entity.WinLostReportModel">
+        select '总计' as startday, sum(betCounts) as betCounts,sum(depositCounts) as depositCounts,sum(deposits) as deposits,sum(withdraws) as withdraws,sum(profits) as profits,sum(deposits)- sum(withdraws) earnings from
+        (<include refid="rptWinLost"/>) t
+    </select>
+
+    <select id="getRptWinLostGroup" resultType="com.eveb.saasops.modules.analysis.entity.RptWinLostModel" parameterType="com.eveb.saasops.modules.analysis.entity.WinLostReportModel">
+        select startday,topAgent,topAgentId,agent,agentId,mbrGroup,sum(betCounts) as betCounts,sum(depositCounts) as depositCounts,sum(deposits) as deposits,sum(withdraws) as withdraws,sum(profits) profits,sum(deposits)- sum(withdraws) earnings
+        from(
+        <include refid="rptWinLost"/>
+        ) t
+        group by startday,topAgent,topAgentId,agent,agentId,mbrGroup
+    </select>
+
+    <select id="getRptWinLostGroupAgent" resultType="com.eveb.saasops.modules.analysis.entity.RptWinLostModel" parameterType="com.eveb.saasops.modules.analysis.entity.WinLostReportModel">
+        select startday,topAgent,topAgentId,agent,agentId,sum(betCounts) as betCounts,sum(depositCounts) as depositCounts,sum(deposits) as deposits,sum(withdraws) as withdraws,sum(profits) profits,sum(deposits)- sum(withdraws) earnings
+        from(
+        <include refid="rptWinLost"/>
+        ) t
+        group by startday,topAgent,topAgentId,agent,agentId
+    </select>
+
+    <select id="getRptWinLostGroupUser" resultType="com.eveb.saasops.modules.analysis.entity.RptWinLostModel" parameterType="com.eveb.saasops.modules.analysis.entity.WinLostReportModel">
+        <include refid="rptWinLostGroupUser"/>
+    </select>
+
+    <select id="getRptWinLostGroupUserTotal" resultType="com.eveb.saasops.modules.analysis.entity.RptWinLostModel" parameterType="com.eveb.saasops.modules.analysis.entity.WinLostReportModel">
+        select  '总计' as startday, sum(depositTimes) as depositTimes,sum(withdrawTimes) withdrawTimes,sum(profitTimes) profitTimes,sum(deposits) deposits,sum(withdraws) withdraws,sum(profits) profits,sum(deposits)- sum(withdraws) earnings from (
+        <include refid="rptWinLostGroupUser"/>
+        ) t
+    </select>
+
+    <select id="getTransactionList" resultType="com.eveb.saasops.modules.analysis.entity.TransactionModel" parameterType="com.eveb.saasops.modules.analysis.entity.WinLostReportModel">
+        select '存款' transactionName,CONCAT(tb.orderPrefix,tb.orderNo) as orderNo,tb.createTime,
+        case when tb.mark=1 then (select case when d.bankType=0 then d.bankName else d.depositType end  from set_basic_sys_deposit d where d.id=tb.companyPayId )
+        else (select o.`name` from set_bacic_onlinePay o where o.id=tb.onlinePayId ) end as transactionType,
+        case when tb.mark=1 then (select   d.bankAccount from set_basic_sys_deposit d where d.id=tb.companyPayId )
+        else (select o.`description` from set_bacic_onlinePay o where o.id=tb.onlinePayId ) end  as accountName,
+        case when tb.mark=1 then (select bank.bankCode from t_bs_bank bank where bank.bankName=sdeposit.bankName ) else '' end as bankcode,
+        tb.depositAmount as amount,tb.memo,tb.auditUser,tb.mark,0 as withdraw
+        from fund_deposit tb
+        LEFT JOIN mbr_account mbr on tb.accountId=mbr.id
+        <!--LEFT JOIN mbr_bankcard bank on mbr.id=bank.accountId-->
+        LEFT JOIN mbr_group g on mbr.groupId=g.id
+        LEFT JOIN (select * from agy_account where parentId=0) tagt on mbr.tagencyId=tagt.id
+        LEFT JOIN agy_account agt on mbr.cagencyId=agt.id
+        LEFT JOIN set_basic_sys_deposit sdeposit on sdeposit.id=tb.companyPayId
+        where tb.`status`=1
+        <if test=" transactionType !=null and transactionType !='' ">
+            And 'deposit' = #{transactionType}
+        </if>
+        <if test=" userId !=null and userId >0 ">
+            And mbr.id=#{userId}
+        </if>
+        <include refid="createTimeWhere"/>
+        <include refid="agentAndUserGroupWhere"/>
+        GROUP BY tb.orderNo
+        union all
+        select '红利',CONCAT(tb.orderPrefix,tb.orderNo) as orderNo,tb.applicationTime,'','','',tb.bonusAmount,tb.memo,tb.auditUser,'',0 as withdraw
+        from opr_act_bonus tb
+        LEFT JOIN mbr_account mbr on tb.accountId=mbr.id
+        LEFT JOIN mbr_group g on mbr.groupId=g.id
+        LEFT JOIN (select * from agy_account where parentId=0) tagt on mbr.tagencyId=tagt.id
+        LEFT JOIN agy_account agt on mbr.cagencyId=agt.id
+        where tb.`status`=1
+        <if test=" transactionType !=null and transactionType !='' ">
+            And 'bonus' = #{transactionType}
+        </if>
+        <if test=" userId !=null and userId >0 ">
+            And mbr.id=#{userId}
+        </if>
+        <if test=" betStrTime !=null and betStrTime !='' ">
+            And tb.applicationTime &gt;= #{betStrTime}
+        </if>
+        <if test=" betEndTime !=null and betEndTime !='' ">
+            And tb.applicationTime &lt;= #{betEndTime}
+        </if>
+        <include refid="agentAndUserGroupWhere"/>
+        union ALL
+        select '提款',CONCAT(tb.orderPrefix,tb.orderNo) as orderNo,tb.createTime,bank.bankName,bank.cardNo,(select bankCode from t_bs_bank a where a.bankName = bank.bankName) as bankCode,tb.drawingAmount,tb.memo,tb.passUser,'',tb.actualArrival as withdraw
+        from fund_acc_withdraw tb
+        LEFT JOIN mbr_bankcard bank on tb.bankCardId = bank.id
+        LEFT JOIN mbr_account mbr on bank.accountId=mbr.id
+        LEFT JOIN mbr_group g on mbr.groupId=g.id
+        LEFT JOIN (select * from agy_account where parentId=0) tagt on mbr.tagencyId=tagt.id
+        LEFT JOIN agy_account agt on mbr.cagencyId=agt.id
+        where tb.`status`=1
+        <if test=" transactionType !=null and transactionType !='' ">
+            And 'withdraw' = #{transactionType}
+        </if>
+        <if test=" userId !=null and userId >0 ">
+            And mbr.id=#{userId}
+        </if>
+        <include refid="createTimeWhere"/>
+        <include refid="agentAndUserGroupWhere"/>
+    </select>
+
+    <sql id="rptWinLost">
+        select a.startday,tagt.agyAccount topAgent,tagt.id topAgentId,agt.agyAccount agent,agt.id agentId,g.groupName mbrGroup,count(distinct(a.username)) betCounts,0 depositCounts,0 deposits,0 withdraws,0 profits
+        from rpt_bet_rcd_day a
+        INNER JOIN mbr_account mbr on a.username=mbr.loginName
+        LEFT JOIN mbr_group g on mbr.groupId=g.id
+        LEFT JOIN (select * from agy_account where parentId=0) tagt on mbr.tagencyId=tagt.id
+        LEFT JOIN agy_account agt on mbr.cagencyId=agt.id
+        where 1=1
+        <include refid="rptWinLostWhere_bet"/>
+        GROUP BY a.startday,tagt.agyAccount,agt.agyAccount,g.groupName
+        union
+        select DATE_FORMAT(tb.createTime,'%Y-%m-%d') startday,tagt.agyAccount topAgent,tagt.id topAgentId,agt.agyAccount agent,agt.id agentId,g.groupName ,0 betCounts ,count(distinct(tb.accountId)) depositCounts,sum(tb.depositAmount) deposit,0 as withdraw,0 profit
+        from fund_deposit tb LEFT JOIN mbr_account mbr on tb.accountId=mbr.id
+        LEFT JOIN mbr_group g on mbr.groupId=g.id
+        LEFT JOIN (select * from agy_account where parentId=0) tagt on mbr.tagencyId=tagt.id
+        LEFT JOIN agy_account agt on mbr.cagencyId=agt.id
+        where tb.`status`=1
+        <include refid="createTimeWhere"/>
+        <include refid="agentAndUserGroupWhere"/>
+        GROUP BY DATE_FORMAT(tb.createTime,'%Y-%m-%d'),tagt.agyAccount,agt.agyAccount,g.groupName
+        union
+        select DATE_FORMAT(tb.createTime,'%Y-%m-%d') startday,tagt.agyAccount topAgent,tagt.id topAgentId,agt.agyAccount agent,agt.id agentId,g.groupName ,0,0,0 as deposit,sum(tb.actualArrival) as withdraw,0 as profit
+        from fund_acc_withdraw tb LEFT JOIN mbr_account mbr on tb.accountId=mbr.id
+        LEFT JOIN mbr_group g on mbr.groupId=g.id
+        LEFT JOIN (select * from agy_account where parentId=0) tagt on mbr.tagencyId=tagt.id
+        LEFT JOIN agy_account agt on mbr.cagencyId=agt.id
+        where tb.`status`=1
+        <include refid="createTimeWhere"/>
+        <include refid="agentAndUserGroupWhere"/>
+        GROUP BY DATE_FORMAT(tb.createTime,'%Y-%m-%d'),tagt.agyAccount,agt.agyAccount,g.groupName
+        union
+        select DATE_FORMAT(tb.applicationTime,'%Y-%m-%d') date,tagt.agyAccount topAgent,tagt.id topAgentId,agt.agyAccount agent,agt.id agentId,g.groupName,0,0,0,0,sum(tb.bonusAmount) profit from opr_act_bonus tb
+        LEFT JOIN mbr_account mbr on tb.accountId=mbr.id
+        LEFT JOIN mbr_group g on mbr.groupId=g.id
+        LEFT JOIN (select * from agy_account where parentId=0) tagt on mbr.tagencyId=tagt.id
+        LEFT JOIN agy_account agt on mbr.cagencyId=agt.id
+        where tb.`status`=1
+        <if test=" betStrTime !=null and betStrTime !='' ">
+            And tb.applicationTime &gt;= #{betStrTime}
+        </if>
+        <if test=" betEndTime !=null and betEndTime !='' ">
+            And tb.applicationTime &lt;= #{betEndTime}
+        </if>
+        <include refid="agentAndUserGroupWhere"/>
+        GROUP BY DATE_FORMAT(tb.applicationTime,'%Y-%m-%d'),tagt.agyAccount,agt.agyAccount,g.groupName
+    </sql>
+
+    <sql id="rptWinLostGroupUser">
+        select startday,userName,userId,mbrGroup,sum(depositTimes) as depositTimes,sum(withdrawTimes) as withdrawTimes,sum(profitTimes) as profitTimes,sum(deposits) as deposits,sum(withdraws) as withdraws
+        ,sum(profits) as profits,sum(deposits)- sum(withdraws) earnings from(
+        select DATE_FORMAT(tb.createTime,'%Y-%m-%d') startday,mbr.loginName userName,mbr.id userId,g.groupName as mbrGroup,count(1) depositTimes ,0 withdrawTimes,
+        0 profitTimes,sum(tb.depositAmount) as deposits,0 withdraws,0 profits
+        from fund_deposit tb LEFT JOIN mbr_account mbr on tb.accountId=mbr.id
+        LEFT JOIN mbr_group g on mbr.groupId=g.id
+        LEFT JOIN (select * from agy_account where parentId=0) tagt on mbr.tagencyId=tagt.id
+        LEFT JOIN agy_account agt on mbr.cagencyId=agt.id
+        where tb.`status`=1
+        <if test=" userId !=null and userId >0 ">
+            And mbr.id=#{userId}
+        </if>
+        <include refid="createTimeWhere"/>
+        <include refid="agentAndUserGroupWhere"/>
+        GROUP BY DATE_FORMAT(tb.createTime,'%Y-%m-%d'),mbr.loginName,g.groupName
+        union
+        select DATE_FORMAT(tb.createTime,'%Y-%m-%d') date,mbr.loginName,mbr.id userId,g.groupName ,0,count(1) withdrawTimes,0,0,sum(tb.actualArrival) as withdraw,0 as profit
+        from fund_acc_withdraw tb LEFT JOIN mbr_account mbr on tb.accountId=mbr.id
+        LEFT JOIN mbr_group g on mbr.groupId=g.id
+        LEFT JOIN (select * from agy_account where parentId=0) tagt on mbr.tagencyId=tagt.id
+        LEFT JOIN agy_account agt on mbr.cagencyId=agt.id
+        where tb.`status`=1
+        <if test=" userId !=null and userId >0 ">
+            And mbr.id=#{userId}
+        </if>
+        <include refid="createTimeWhere"/>
+        <include refid="agentAndUserGroupWhere"/>
+        GROUP BY DATE_FORMAT(tb.createTime,'%Y-%m-%d'),mbr.loginName,g.groupName
+        union
+        select DATE_FORMAT(tb.applicationTime,'%Y-%m-%d') date,mbr.loginName,mbr.id userId,g.groupName ,0 depositTimes ,0 withdrawTimes,
+        count(tb.accountId) profitTimes,0 as deposits,0 withdraws,sum(tb.bonusAmount) profits
+        from opr_act_bonus tb
+        LEFT JOIN mbr_account mbr on tb.accountId=mbr.id
+        LEFT JOIN mbr_group g on mbr.groupId=g.id
+        LEFT JOIN (select * from agy_account where parentId=0) tagt on mbr.tagencyId=tagt.id
+        LEFT JOIN agy_account agt on mbr.cagencyId=agt.id
+        where tb.`status`=1
+        <if test=" betStrTime !=null and betStrTime !='' ">
+            And tb.applicationTime &gt;= #{betStrTime}
+        </if>
+        <if test=" betEndTime !=null and betEndTime !='' ">
+            And tb.applicationTime &lt;= #{betEndTime}
+        </if>
+        <if test=" userId !=null and userId >0 ">
+            And mbr.id=#{userId}
+        </if>
+        <include refid="agentAndUserGroupWhere"/>
+        GROUP BY DATE_FORMAT(tb.applicationTime,'%Y-%m-%d'),mbr.loginName,g.groupName
+        ) t <!--where t.mbrGroup IN (SELECT groupName FROM mbr_group WHERE id IN (SELECT mbrGroupId
+        FROM sys_user_mbrGroupRelation WHERE userId = (SELECT user_id FROM sys_user WHERE username = #{loginSysUserName})))-->
+        group by startday,userName,userId,mbrGroup
+    </sql>
+
+    <sql id="createTimeWhere">
+        <if test=" betStrTime !=null and betStrTime !='' ">
+            And tb.createTime &gt;= #{betStrTime}
+        </if>
+        <if test=" betEndTime !=null and betEndTime !='' ">
+            And tb.createTime &lt;= #{betEndTime}
+        </if>
+    </sql>
+
+    <sql id="agentAndUserGroupWhere">
+        <if test="parentAgentIdList != null and parentAgentIdList !='' ">
+            AND tagt.id in ( ${parentAgentIdList} )
+        </if>
+        <if test="agentIdList != null and agentIdList !='' ">
+            AND agt.id in ( ${agentIdList} )
+        </if>
+        <if test="groupIdList != null and groupIdList !='' ">
+            AND mbr.groupId in ( ${groupIdList} )
+        </if>
+        <if test="userName !=null and userName !='' ">
+            and mbr.loginName like CONCAT('%',#{userName}, '%')
+        </if>
+    </sql>
+
+    <sql id="agentAndUserGroupWhere_Bouns">
+        <if test=" betStrTime !=null and betStrTime !='' ">
+            And tb.applicationTime &gt;= #{betStrTime}
+        </if>
+        <if test=" betEndTime !=null and betEndTime !='' ">
+            And tb.applicationTime &lt;= #{betEndTime}
+        </if>
+        <if test="parentAgentidList != null and parentAgentidList !='' ">
+            AND tagt.id in ( ${parentAgentidList} )
+        </if>
+        <if test="agentidList != null and agentidList !='' ">
+            AND agt.id in ( ${agentidList} )
+        </if>
+        <if test="groupidList != null and groupidList !='' ">
+            AND mbr.groupId in ( ${groupidList} )
+        </if>
+        <if test=" userId !=null and userId !='' ">
+            and mbr.id=#{userId}
+        </if>
+        <if test=" userName !=null and userName !='' ">
+            and mbr.loginName like CONCAT('%',#{userName}, '%')
+        </if>
+    </sql>
+
+    <sql id="rptWinLostWhere_bet">
+        <if test=" betStrTime !=null and betStrTime !='' ">
+            And a.startday &gt;=DATE_FORMAT(#{betStrTime},'%Y-%m-%d')
+        </if>
+        <if test=" betEndTime !=null and betEndTime !='' ">
+            And a.startday &lt;=DATE_FORMAT(#{betEndTime},'%Y-%m-%d')
+        </if>
+        <if test="parentAgentIdList != null and parentAgentIdList !='' ">
+            AND tagt.id in ( ${parentAgentIdList} )
+        </if>
+        <if test="agentIdList != null and agentIdList !='' ">
+            AND agt.id in ( ${agentIdList} )
+        </if>
+        <if test="groupIdList != null and groupIdList !='' ">
+            AND mbr.groupId in ( ${groupIdList} )
+        </if>
+        <if test=" userName !=null and userName !='' ">
+            and mbr.loginName like CONCAT('%',#{userName}, '%')
+        </if>
+    </sql>
+
+    <select id="getApiPrefixBySiteCode" parameterType="String" resultType="String">
+        select ap.prefix from t_cp_site s left join
+        t_gm_apiprefix ap on s.id=ap.siteId
+        where s.siteCode=#{siteCode}
+    </select>
+
+    <select id="getBonusReportList" parameterType="com.eveb.saasops.modules.analysis.entity.BounsReportQueryModel"
+            resultType="com.eveb.saasops.modules.analysis.entity.RptWinLostModel">
+        <include refid="rptBonusReportSql"/>
+        order by 1 desc
+    </select>
+
+    <select id="getBonusReportListTotal" parameterType="com.eveb.saasops.modules.analysis.entity.BounsReportQueryModel"
+            resultType="com.eveb.saasops.modules.analysis.entity.RptWinLostModel">
+        select '总计' as startday, sum(profitTimes) as profitTimes,sum(profitCounts) profitCounts,sum(profits) profits
+        from (<include refid="rptBonusReportSql"/>)t
+    </select>
+
+    <select id="getBonusGroupTopAgentReportList"
+            parameterType="com.eveb.saasops.modules.analysis.entity.BounsReportQueryModel"
+            resultType="com.eveb.saasops.modules.analysis.entity.RptWinLostModel">
+        select DATE_FORMAT(tb.applicationTime,'%Y-%m-%d') startday,tagt.agyAccount as topAgent,tagt.id
+        topAgentId,count(distinct(tb.accountId)) profitTimes,count(1) profitCounts,sum(tb.bonusAmount) profits
+        from opr_act_bonus tb
+        LEFT JOIN mbr_account mbr on tb.accountId=mbr.id
+        LEFT JOIN mbr_group g on mbr.groupId=g.id
+        LEFT JOIN (select * from agy_account where parentId=0) tagt on mbr.tagencyId=tagt.id
+        LEFT JOIN agy_account agt on mbr.cagencyId=agt.id
+        LEFT JOIN opr_act_activity activity on tb.activityId=activity.id
+        LEFT JOIN opr_act_cat cat on activity.actCatId=cat.id
+        where tb.`status`=1
+        <include refid="activityWhere"/>
+        <include refid="agentAndUserGroupWhere_Bouns"/>
+        GROUP BY DATE_FORMAT(tb.applicationTime,'%Y-%m-%d'),tagt.agyAccount
+    </select>
+
+    <select id="getBonusGroupAgentReportList"
+            parameterType="com.eveb.saasops.modules.analysis.entity.BounsReportQueryModel"
+            resultType="com.eveb.saasops.modules.analysis.entity.RptWinLostModel">
+        select DATE_FORMAT(tb.applicationTime,'%Y-%m-%d') startday,agt.agyAccount as agent,agt.id
+        agentId,count(distinct(tb.accountId)) profitTimes,count(1) profitCounts,sum(tb.bonusAmount) profits
+        from opr_act_bonus tb
+        LEFT JOIN mbr_account mbr on tb.accountId=mbr.id
+        LEFT JOIN mbr_group g on mbr.groupId=g.id
+        LEFT JOIN (select * from agy_account where parentId=0) tagt on mbr.tagencyId=tagt.id
+        LEFT JOIN agy_account agt on mbr.cagencyId=agt.id
+        LEFT JOIN opr_act_activity activity on tb.activityId=activity.id
+        LEFT JOIN opr_act_cat cat on activity.actCatId=cat.id
+        where tb.`status`=1
+        <include refid="activityWhere"/>
+        <include refid="agentAndUserGroupWhere_Bouns"/>
+        GROUP BY DATE_FORMAT(tb.applicationTime,'%Y-%m-%d'),agt.agyAccount
+    </select>
+
+    <select id="getBonusGroupUserReportList"
+            parameterType="com.eveb.saasops.modules.analysis.entity.BounsReportQueryModel"
+            resultType="com.eveb.saasops.modules.analysis.entity.RptWinLostModel">
+        select DATE_FORMAT(tb.applicationTime,'%Y-%m-%d') startday,g.groupName mbrGroup,mbr.loginName
+        userName,count(distinct(tb.accountId)) profitTimes,count(1) profitCounts,sum(tb.bonusAmount) profits
+        from opr_act_bonus tb
+        LEFT JOIN mbr_account mbr on tb.accountId=mbr.id
+        LEFT JOIN mbr_group g on mbr.groupId=g.id
+        LEFT JOIN (select * from agy_account where parentId=0) tagt on mbr.tagencyId=tagt.id
+        LEFT JOIN agy_account agt on mbr.cagencyId=agt.id
+        LEFT JOIN opr_act_activity activity on tb.activityId=activity.id
+        LEFT JOIN opr_act_cat cat on activity.actCatId=cat.id
+        where tb.`status`=1
+        <include refid="activityWhere"/>
+        <include refid="agentAndUserGroupWhere_Bouns"/>
+        GROUP BY DATE_FORMAT(tb.applicationTime,'%Y-%m-%d'),g.groupName,mbr.loginName
+    </select>
+
+    <select id="getBonusGroupUserTotal" parameterType="com.eveb.saasops.modules.analysis.entity.BounsReportQueryModel"
+            resultType="com.eveb.saasops.modules.analysis.entity.RptWinLostModel">
+        select * from (
+        select DATE_FORMAT(tb.applicationTime,'%Y-%m-%d') startday,tagt.agyAccount topAgent,agt.agyAccount
+        agent,g.groupName mbrGroup,mbr.loginName userName,mbr.id userId,count(distinct(tb.accountId))
+        profitTimes,count(1) profitCounts,sum(tb.bonusAmount) profits
+        from opr_act_bonus tb
+        LEFT JOIN mbr_account mbr on tb.accountId=mbr.id
+        LEFT JOIN mbr_group g on mbr.groupId=g.id
+        LEFT JOIN (select * from agy_account where parentId=0) tagt on mbr.tagencyId=tagt.id
+        LEFT JOIN agy_account agt on mbr.cagencyId=agt.id
+        LEFT JOIN opr_act_activity activity on tb.activityId=activity.id
+        LEFT JOIN opr_act_cat cat on activity.actCatId=cat.id
+        where tb.`status`=1
+        <include refid="activityWhere"/>
+        <include refid="agentAndUserGroupWhere_Bouns"/>
+        GROUP by DATE_FORMAT(tb.applicationTime,'%Y-%m-%d'),tagt.agyAccount,agt.agyAccount,g.groupName,mbr.loginName
+        ) t
+        group by startday,userName,userId,mbrGroup
+    </select>
+
+    <select id="getBonusList" parameterType="com.eveb.saasops.modules.analysis.entity.BounsReportQueryModel"
+            resultType="com.eveb.saasops.modules.analysis.entity.TransactionModel">
+        select ac.activityName,c.catName,CONCAT(tb.orderPrefix,tb.orderNo),tb.applicationTime,tb.bonusAmount,tb.orderNo
+        from opr_act_bonus tb
+        LEFT JOIN opr_act_activity ac on tb.activityId=ac.id
+        LEFT JOIN opr_act_cat c on ac.actCatId=c.id
+        LEFT JOIN mbr_account mbr on tb.accountId=mbr.id
+        LEFT JOIN mbr_group g on mbr.groupId=g.id
+        LEFT JOIN (select * from agy_account where parentId=0) tagt on mbr.tagencyId=tagt.id
+        LEFT JOIN agy_account agt on mbr.cagencyId=agt.id
+        LEFT JOIN opr_act_activity activity on tb.activityId=activity.id
+        LEFT JOIN opr_act_cat cat on activity.actCatId=cat.id
+        where tb.`status`=1
+        <include refid="activityWhere"/>
+        <include refid="agentAndUserGroupWhere_Bouns"/>
+    </select>
+
+    <sql id="rptBonusReportSql">
+        select DATE_FORMAT(tb.applicationTime,'%Y-%m-%d') startday,count(distinct(tb.accountId)) profitTimes,count(1)
+        profitCounts,sum(tb.bonusAmount) profits
+        from opr_act_bonus tb
+        LEFT JOIN mbr_account mbr on tb.accountId=mbr.id
+        LEFT JOIN mbr_group g on mbr.groupId=g.id
+        LEFT JOIN (select * from agy_account where parentId=0) tagt on mbr.tagencyId=tagt.id
+        LEFT JOIN agy_account agt on mbr.cagencyId=agt.id
+        LEFT JOIN opr_act_activity activity on tb.activityId=activity.id
+        LEFT JOIN opr_act_cat cat on activity.actCatId=cat.id
+        where tb.`status`=1
+        <include refid="activityWhere"/>
+        <include refid="agentAndUserGroupWhere_Bouns"/>
+        GROUP BY DATE_FORMAT(tb.applicationTime,'%Y-%m-%d')
+    </sql>
+
+    <sql id="activityWhere">
+        <if test="activityIdList != null and activityIdList !='' ">
+            AND activity.id in ( ${activityIdList} )
+        </if>
+        <if test="catIdList != null and catIdList !='' ">
+            AND cat.id in ( ${catIdList} )
+        </if>
+
+        <if test=" enablePc !=null and enablePc >0 ">
+            And activity.enablePc=1
+        </if>
+        <if test=" enableMb !=null and enableMb >0 ">
+            And activity.enableMb=1
+        </if>
+    </sql>
+
+    <select id="getRptBetTotalList" resultType="com.eveb.saasops.modules.analysis.entity.RptBetTotalModel"
+            parameterType="com.eveb.saasops.modules.analysis.entity.GameReportModel">
+        <include refid="rptBetTotalListSql"/>
+    </select>
+
+    <select id="getRptBetTotals" resultType="com.eveb.saasops.modules.analysis.entity.RptBetTotalModel"
+            parameterType="com.eveb.saasops.modules.analysis.entity.GameReportModel">
+        select
+        '总计' AS startday,
+        sum(times) times,
+        sum(betTotal) betTotal,
+        sum(validBetTotal) validBetTotal,
+        sum(payoutTotal) payoutTotal,sum(jackpotBetTotal) jackpotBetTotal,
+        sum(jackpotPayoutTotal) jackpotPayoutTotal,
+        sum(t.payoutTotal) / sum(t.validBetTotal) * 100 AS winRate,
+        sum(t.jackpotBetTotal) - sum(t.jackpotPayoutTotal) AS jackpotWinTotal
+        from (<include refid="rptBetTotalListSql"/>) t
+    </select>
+
+    <sql id="rptBetTotalListSql">
+        select DATE_FORMAT(tb.startday,'%Y-%m-%d') startday,count(distinct(tagt.agyAccount))
+        topAgentTimes,count(distinct(agt.agyAccount)) agentTimes,count(tb.username) as
+        userCounts,count(distinct(tb.username)) as times,sum(tb.bet) as betTotal,sum(tb.validbet) as validBetTotal,
+        sum(tb.payout) as payoutTotal,sum(tb.jackpotBet) as jackpotBetTotal,sum(tb.jackpotPayout) as
+        jackpotPayoutTotal,sum(tb.payout)/sum(tb.validbet)*100 as winRate,
+        sum(tb.jackpotPayout)-sum(tb.jackpotBet) as jackpotWinTotal
+        from rpt_bet_rcd_day tb
+        left join
+        <include refid="gameTableSql"/>
+        gm on tb.platform=gm.platform
+        <include refid="joinUserAndAgentTableSql_Loginname"/>
+        where tb.gametype=gm.codeid
+        <if test=" betStrTime !=null and betStrTime !='' ">
+            And tb.startday &gt;=DATE_FORMAT(#{betStrTime},'%Y-%m-%d')
+        </if>
+        <if test=" betEndTime !=null and betEndTime !='' ">
+            And tb.startday &lt;= DATE_FORMAT(#{betEndTime},'%Y-%m-%d')
+        </if>
+        <include refid="agentAndUserGroupWhere"/>
+        GROUP BY DATE_FORMAT(startday,'%Y-%m-%d')
+        ORDER BY DATE_FORMAT(startday,'%Y-%m-%d') DESC
+    </sql>
+
+    <select id="getBetDayGroupGameTypeList" resultType="com.eveb.saasops.modules.analysis.entity.RptBetTotalModel"
+            parameterType="com.eveb.saasops.modules.analysis.entity.GameReportModel">
+        select DATE_FORMAT(tb.startday,'%Y-%m-%d') startday,gm.platform platform,gm.depotId platformId, gm.catName
+        gameCategory,gm.catId gameCategoryId,count(tb.username) as userCounts,count(distinct(tb.username)) as
+        times,sum(tb.bet) as betTotal,sum(tb.validbet) as validBetTotal,
+        sum(tb.payout) as payoutTotal,sum(tb.jackpotBet) as jackpotBetTotal,sum(tb.jackpotPayout) as
+        jackpotPayoutTotal,sum(tb.payout)/sum(tb.validbet)*100 as winRate,
+        sum(tb.jackpotPayout)-sum(tb.jackpotBet) as jackpotWinTotal
+        from rpt_bet_rcd_day tb
+        left join
+        <include refid="gameTableSql"/>
+        gm on tb.platform=gm.platform
+        <include refid="joinUserAndAgentTableSql_Loginname"/>
+        where tb.gametype=gm.codeid
+        <include refid="gameCodeAndDayWhere"/>
+        group by gm.platform, gm.catName
+    </select>
+
+    <select id="getBetDayGroupTopAgentList" resultType="com.eveb.saasops.modules.analysis.entity.RptBetTotalModel"
+            parameterType="com.eveb.saasops.modules.analysis.entity.GameReportModel">
+        select tagt.agyAccount topAgent,tagt.id topAgentId,count(distinct(agt.agyAccount)) as
+        agentTimes,count(distinct(tb.username)) as times,sum(tb.bet) as betTotal,sum(tb.validbet) as validBetTotal,
+        sum(tb.payout) as payoutTotal,sum(tb.jackpotBet) as jackpotBetTotal,sum(tb.jackpotPayout) as
+        jackpotPayoutTotal,sum(tb.payout)/sum(tb.validbet)*100 as winRate,
+        sum(tb.jackpotBet)-sum(tb.jackpotPayout) as jackpotWinTotal
+        from rpt_bet_rcd_day tb
+        left join
+        <include refid="gameTableSql"/>
+        gm on tb.platform=gm.platform
+        <include refid="joinUserAndAgentTableSql_Loginname"/>
+        where tb.gametype=gm.codeid
+        <include refid="gameCodeAndDayWhere"/>
+        group by tagt.agyAccount
+    </select>
+
+    <select id="getBetDayGroupAgentList" resultType="com.eveb.saasops.modules.analysis.entity.RptBetTotalModel"
+            parameterType="com.eveb.saasops.modules.analysis.entity.GameReportModel">
+        select tagt.agyAccount topAgent,tagt.id topAgentId,agt.agyAccount agent,agt.id
+        agentId,count(distinct(tb.username)) as times,sum(tb.bet) as betTotal,sum(tb.validbet) as validBetTotal,
+        sum(tb.payout) as payoutTotal,sum(tb.jackpotBet) as jackpotBetTotal,sum(tb.jackpotPayout) as
+        jackpotPayoutTotal,sum(tb.payout)/sum(tb.validbet)*100 as winRate,
+        sum(tb.jackpotBet)-sum(tb.jackpotPayout) as jackpotWinTotal
+        from rpt_bet_rcd_day tb
+        left join
+        <include refid="gameTableSql"/>
+        gm on tb.platform=gm.platform
+        <include refid="joinUserAndAgentTableSql_Loginname"/>
+        where tb.gametype=gm.codeid
+        <include refid="gameCodeAndDayWhere"/>
+        <if test=" topAgent !=null and topAgent >0 ">
+            And tagt.id=#{topAgent}
+        </if>
+        group by tagt.agyAccount,agt.agyAccount
+    </select>
+
+    <select id="getBetDayGroupUserList" resultType="com.eveb.saasops.modules.analysis.entity.RptBetTotalModel"
+            parameterType="com.eveb.saasops.modules.analysis.entity.GameReportModel">
+        select tb.username as userName,sum(tb.bet) as betTotal,sum(tb.validbet) as validBetTotal,
+        sum(tb.payout) as payoutTotal,sum(tb.jackpotBet) as jackpotBetTotal,sum(tb.jackpotPayout) as
+        jackpotPayoutTotal,sum(tb.payout)/sum(tb.validbet)*100 as winRate,
+        sum(tb.jackpotBet)-sum(tb.jackpotPayout) as jackpotWinTotal
+        from rpt_bet_rcd_day tb
+        left join
+        <include refid="gameTableSql"/>
+        gm on tb.platform=gm.platform
+        <include refid="joinUserAndAgentTableSql_Loginname"/>
+        where tb.gametype=gm.codeid
+        <include refid="gameCodeAndDayWhere"/>
+        <if test=" agent !=null and agent >0 ">
+            And agt.id=#{agent}
+        </if>
+        group by tb.username
+    </select>
+
+    <select id="getBetDayByAgentTotal" resultType="com.eveb.saasops.modules.analysis.entity.RptBetTotalModel"
+            parameterType="com.eveb.saasops.modules.analysis.entity.GameReportModel">
+        select count(distinct(tb.username)) as times,sum(tb.bet) as betTotal,sum(tb.validbet) as validBetTotal,
+        sum(tb.payout) as payoutTotal,sum(tb.jackpotBet) as jackpotBetTotal,sum(tb.jackpotPayout) as
+        jackpotPayoutTotal,sum(tb.payout)/sum(tb.validbet)*100 as winRate,
+        sum(tb.jackpotBet)-sum(tb.jackpotPayout) as jackpotWinTotal
+        from rpt_bet_rcd_day tb
+        left join
+        <include refid="gameTableSql"/>
+        gm on tb.platform=gm.platform
+        <include refid="joinUserAndAgentTableSql_Loginname"/>
+        where tb.gametype=gm.codeid
+        <include refid="gameCodeAndDayWhere"/>
+        <if test=" topAgentId !=null and topAgentId !='' ">
+            And tagt.id =#{topAgentId}
+        </if>
+        <if test=" agentId !=null and agentId !='' ">
+            And agt.id =#{agentId}
+        </if>
+    </select>
+
+    <sql id="gameCodeAndDayWhere">
+        <if test=" betStrTime !=null and betStrTime !='' ">
+            And tb.startday &gt;=DATE_FORMAT(#{betStrTime},'%Y-%m-%d')
+        </if>
+        <if test=" betEndTime !=null and betEndTime !='' ">
+            And tb.startday &lt;= DATE_FORMAT(#{betEndTime},'%Y-%m-%d')
+        </if>
+        <if test="platformList != null and platformList.size > 0">
+            AND gm.depotId in
+            <foreach collection="platformList" open="(" close=")" separator="," item="platform">
+                #{platform}
+            </foreach>
+        </if>
+        <if test="catIdList != null and catIdList !='' ">
+            AND gm.catId in ( ${catIdList} )
+        </if>
+        <if test=" gameCode !=null and gameCode !='' ">
+            And gm.gameName =#{gameCode}
+        </if>
+    </sql>
+
+    <select id="getRptMemberList" resultType="com.eveb.saasops.modules.analysis.entity.RptMemberModel">
+        select startday,sum(deposit) deposits,sum(withdraw) withdraws,sum(newMbr) newMbrs,sum(newDeposits) newDeposits,sum(activeMbr) activeMbrs,sum(totalMbr) totalMbrs,sum(payouts) payouts,sum(validBets)  validBets from (
+            select a.startday,0 deposit,0 withdraw,0 newMbr,0 newDeposits,0 activeMbr,0 totalMbr,sum(a.payout) payouts,sum(a.validbet) validBets
+            from
+            rpt_bet_rcd_day a where 1=1
+            GROUP BY a.startday
+        union all
+            select DATE_FORMAT(tb.createTime,'%Y-%m-%d') date,sum(tb.depositAmount) deposit,0 withdraw,0 newMbr,0 newDeposits,0 activeMbr,0 totalMbr,0 payouts,0 validBets
+            from fund_deposit tb LEFT JOIN mbr_account mbr on tb.accountId=mbr.id
+            where tb.`status`=1
+            GROUP BY DATE_FORMAT(tb.createTime,'%Y-%m-%d')
+        union all
+            select DATE_FORMAT(tb.createTime,'%Y-%m-%d') date,0 deposit,sum(tb.actualArrival) withdraw,0 newMbr,0 newDeposits,0 activeMbr,0 totalMbr,0 payouts,0 validBets
+            from fund_acc_withdraw tb LEFT JOIN mbr_account mbr on tb.accountId=mbr.id
+            where tb.`status`=1
+            GROUP BY DATE_FORMAT(tb.createTime,'%Y-%m-%d')
+        union all
+            select a.date,0 deposit,0 withdraw,count(DISTINCT a.accountId) newMbr,count(case when a.accountId=d.accountId then 1 else null end) newDeposits,0 activeMbr,0 totalMbr,0 payouts,0 validBets
+            from (select DATE_FORMAT(a.registerTime,'%Y-%m-%d') date, id accountId from mbr_account a
+            GROUP BY DATE_FORMAT(a.registerTime,'%Y-%m-%d'),id ) a left join
+            (select DATE_FORMAT(d.createTime,'%Y-%m-%d') date,accountId from fund_deposit d where d.`status`=1 GROUP BY DATE_FORMAT(d.createTime,'%Y-%m-%d'),accountId ) d on a.date=d.date
+            GROUP BY a.date
+        union all
+            select t.date,0 deposit,0 withdraw,0 newMbr,0 newDeposits,count(DISTINCT accountId) activeMbr,0 totalMbr,0 payouts,0 validBets from
+            (select DATE_FORMAT(d.createTime,'%Y-%m-%d') date,accountId from fund_deposit d where d.`status`=1 GROUP BY DATE_FORMAT(d.createTime,'%Y-%m-%d'),accountId
+        union all
+            select DATE_FORMAT(w.createTime,'%Y-%m-%d') date,accountId from fund_acc_withdraw w where w.`status`=1 GROUP BY DATE_FORMAT(w.createTime,'%Y-%m-%d'),accountId
+        union all
+            select startday,a.id from rpt_bet_rcd_day r inner join mbr_account a on a.loginName=r.username GROUP BY r.startday,a.id) t
+            GROUP BY t.date
+        union all
+            select date_format(date,'%Y-%m-%d') date,0 deposit,0 withdraw,0 newMbr,0 newDeposits,0 activeMbr,0 totalMbr,0 payouts,0 validBets
+            from
+            (select adddate('2000-01-01',t3.i*1000 + t2.i*100 + t1.i*10 + t0.i) date
+            from
+            (select 0 i union select 1 union select 2 union select 3 union select 4 union select 5 union select 6 union select 7 union select 8 union select 9) t0,
+            (select 0 i union select 1 union select 2 union select 3 union select 4 union select 5 union select 6 union select 7 union select 8 union select 9) t1,
+            (select 0 i union select 1 union select 2 union select 3 union select 4 union select 5 union select 6 union select 7 union select 8 union select 9) t2,
+            (select 0 i union select 1 union select 2 union select 3 union select 4 union select 5 union select 6 union select 7 union select 8 union select 9) t3
+            ) c
+            where date between date_sub(NOW(),INTERVAL #{lmt} DAY) and NOW()
+            ) t
+        GROUP BY startday
+        ORDER BY 1 desc
+        LIMIT #{lmt}
+    </select>
+
+    <select id="getRegisterCounts" parameterType="String" resultType="Integer">
+        select count(1) from mbr_account a where a.registerTime &lt;= date_format(#{date},'%Y-%m-%d 23:59:59')
+    </select>
+
+    <select id="findWinLostList" resultType="com.eveb.saasops.modules.analysis.entity.WinLostReport">
+        select '股东' level,count(tb1.username) total,sum(tb1.bet) betTotal,sum(tb1.validbet) validbetTotal,sum(tb1.payout) payoutTotal,CONCAT(tb1.platform,tb1.catName) categoryTotal,truncate((sum(tb1.payout)/sum(tb1.validbet))*100,2) winLostRatio from
+        (select rbrd.username,rbrd.platform,tb.catName ,sum(rbrd.bet) bet,sum(rbrd.validbet) validbet,sum(rbrd.payout) payout from rpt_bet_rcd_day rbrd
+        inner join mbr_account ma on rbrd.username=ma.loginName
+        inner join agy_account aa on ma.tagencyId=aa.id
+        inner join (select tb1.depotName platform,tb1.depotId,tb2.catName,tb2.id catId,tb1.gameCode codeid,tb1.gameName codename,tb2.id gameTypeId,tb1.subCatId  from
+        (select id,depotId,depotName,catId,gameCode,gameName,subCatId from t_gm_game where available=1 and gameCode !=''
+        union select id,depotId,depotName,catId,mbGameCode,gameName,subCatId from t_gm_game where available=1  and mbGameCode !=''
+        union select id,depotId,depotName,catId,adGameCode,gameName,subCatId from t_gm_game where available=1  and adGameCode !=''
+        union select id,depotId,depotName,catId,downGameCode,gameName,subCatId from t_gm_game where available=1  and downGameCode !=''
+        union select id,depotId,depotName,catId,embeddedCode,gameName,subCatId from t_gm_game where available=1  and embeddedCode !=''
+        union select id,depotId,depotName,catId,embeddedCode1,gameName,subCatId from t_gm_game where available=1 and embeddedCode1 !='')tb1,t_gm_cat tb2 where tb1.catId=tb2.id ) tb on rbrd.platform=tb.platform and rbrd.gametype=tb.codeid
+        <include refid="WinLost_where"/>
+        group by tb.platform,tb.catName,rbrd.username) tb1
+        GROUP BY tb1.platform,tb1.catName
+    </select>
+    <select id="findWinLostListOfTagency" resultType="com.eveb.saasops.modules.analysis.entity.WinLostReport">
+        select '总代' level,tagencyId,userName,count(tb1.user) total,sum(tb1.bet) betTotal,sum(tb1.validbet) validbetTotal,sum(tb1.payout) payoutTotal,CONCAT(tb1.platform,tb1.catName) categoryTotal,truncate((sum(tb1.payout)/sum(tb1.validbet))*100,2) winLostRatio from
+        (select aa.id tagencyId,aa.realName userName,rbrd.username user,rbrd.platform,tb.catName ,sum(rbrd.bet) bet,sum(rbrd.validbet) validbet,sum(rbrd.payout) payout from rpt_bet_rcd_day rbrd
+        inner join mbr_account ma on rbrd.username=ma.loginName
+        inner join agy_account aa on ma.tagencyId=aa.id
+        inner join (select tb1.depotName platform,tb1.depotId,tb2.catName,tb2.id catId,tb1.gameCode codeid,tb1.gameName codename,tb2.id gameTypeId,tb1.subCatId  from
+        (select id,depotId,depotName,catId,gameCode,gameName,subCatId from t_gm_game where available=1 and gameCode !=''
+        union select id,depotId,depotName,catId,mbGameCode,gameName,subCatId from t_gm_game where available=1  and mbGameCode !=''
+        union select id,depotId,depotName,catId,adGameCode,gameName,subCatId from t_gm_game where available=1  and adGameCode !=''
+        union select id,depotId,depotName,catId,downGameCode,gameName,subCatId from t_gm_game where available=1  and downGameCode !=''
+        union select id,depotId,depotName,catId,embeddedCode,gameName,subCatId from t_gm_game where available=1  and embeddedCode !=''
+        union select id,depotId,depotName,catId,embeddedCode1,gameName,subCatId from t_gm_game where available=1 and embeddedCode1 !='')tb1,t_gm_cat tb2 where tb1.catId=tb2.id ) tb on rbrd.platform=tb.platform and rbrd.gametype=tb.codeid
+        <include refid="WinLost_where"/>
+        group by tb.platform,tb.catName,rbrd.username) tb1
+        GROUP BY tb1.tagencyId
+    </select>
+    <select id="findWinLostListByTagencyId" resultType="com.eveb.saasops.modules.analysis.entity.WinLostReport">
+        select '代理' level,cagencyId,userName,count(tb1.user) total,sum(tb1.bet) betTotal,sum(tb1.validbet) validbetTotal,sum(tb1.payout) payoutTotal,CONCAT(tb1.platform,tb1.catName) categoryTotal,truncate((sum(tb1.payout)/sum(tb1.validbet))*100,2) winLostRatio  from
+        (select aa.id cagencyId,aa.realName userName,rbrd.username user,rbrd.platform,tb.catName ,sum(rbrd.bet) bet,sum(rbrd.validbet) validbet,sum(rbrd.payout) payout from rpt_bet_rcd_day rbrd
+        inner join mbr_account ma on rbrd.username=ma.loginName
+        inner join agy_account aa on ma.cagencyId=aa.id
+        inner join (select tb1.depotName platform,tb1.depotId,tb2.catName,tb2.id catId,tb1.gameCode codeid,tb1.gameName codename,tb2.id gameTypeId,tb1.subCatId  from
+        (select id,depotId,depotName,catId,gameCode,gameName,subCatId from t_gm_game where available=1 and gameCode !=''
+        union select id,depotId,depotName,catId,mbGameCode,gameName,subCatId from t_gm_game where available=1  and mbGameCode !=''
+        union select id,depotId,depotName,catId,adGameCode,gameName,subCatId from t_gm_game where available=1  and adGameCode !=''
+        union select id,depotId,depotName,catId,downGameCode,gameName,subCatId from t_gm_game where available=1  and downGameCode !=''
+        union select id,depotId,depotName,catId,embeddedCode,gameName,subCatId from t_gm_game where available=1  and embeddedCode !=''
+        union select id,depotId,depotName,catId,embeddedCode1,gameName,subCatId from t_gm_game where available=1 and embeddedCode1 !='')tb1,t_gm_cat tb2 where tb1.catId=tb2.id ) tb on rbrd.platform=tb.platform and rbrd.gametype=tb.codeid
+        <include refid="WinLost_where"/>
+        group by tb.platform,tb.catName,rbrd.username ) tb1
+        GROUP BY tb1.cagencyId
+    </select>
+    <select id="findWinLostListByCagencyId" parameterType="com.eveb.saasops.modules.analysis.entity.WinLostReport" resultType="com.eveb.saasops.modules.analysis.entity.WinLostReport">
+        select '会员' level,accountId,userName,count(tb1.user) total,sum(tb1.bet) betTotal,sum(tb1.validbet) validbetTotal,sum(tb1.payout) payoutTotal,CONCAT(tb1.platform,tb1.catName) categoryTotal,truncate((sum(tb1.payout)/sum(tb1.validbet))*100,2) winLostRatio  from
+        (select ma.id accountId,ma.loginName userName,rbrd.username user,rbrd.platform,tb.catName ,sum(rbrd.bet) bet,sum(rbrd.validbet) validbet,sum(rbrd.payout) payout from rpt_bet_rcd_day rbrd
+        inner join mbr_account ma on rbrd.username=ma.loginName
+        inner join agy_account aa on ma.cagencyId=aa.id
+        inner join (select tb1.depotName platform,tb1.depotId,tb2.catName,tb2.id catId,tb1.gameCode codeid,tb1.gameName codename,tb2.id gameTypeId,tb1.subCatId  from
+        (select id,depotId,depotName,catId,gameCode,gameName,subCatId from t_gm_game where available=1 and gameCode !=''
+        union select id,depotId,depotName,catId,mbGameCode,gameName,subCatId from t_gm_game where available=1  and mbGameCode !=''
+        union select id,depotId,depotName,catId,adGameCode,gameName,subCatId from t_gm_game where available=1  and adGameCode !=''
+        union select id,depotId,depotName,catId,downGameCode,gameName,subCatId from t_gm_game where available=1  and downGameCode !=''
+        union select id,depotId,depotName,catId,embeddedCode,gameName,subCatId from t_gm_game where available=1  and embeddedCode !=''
+        union select id,depotId,depotName,catId,embeddedCode1,gameName,subCatId from t_gm_game where available=1 and embeddedCode1 !='' )tb1,t_gm_cat tb2 where tb1.catId=tb2.id ) tb on rbrd.platform=tb.platform and rbrd.gametype=tb.codeid
+        <include refid="WinLost_where"/>
+        group by tb.platform,tb.catName,rbrd.username ) tb1
+        GROUP BY tb1.accountId
+    </select>
+    <select id="findWinLostListByAccountId" resultType="com.eveb.saasops.modules.analysis.entity.WinLostReport">
+        select rbrd.username loginName,tb.platform depositName,tb.catName catName,tb.codename gameName,SUM(rbrd.bet) betTotal, sum(rbrd.validbet) validbetTotal,sum(rbrd.payout) payoutTotal, sum(rbrd.quantity) gameTimes,truncate((sum(rbrd.payout)/sum(rbrd.validbet))*100,2) winLostRatio from rpt_bet_rcd_day rbrd
+        inner join mbr_account ma on rbrd.username=ma.loginName
+        inner join agy_account aa on ma.cagencyId=aa.id
+        inner join (select tb1.depotName platform,tb1.depotId,tb2.catName,tb2.id catId,tb1.gameCode codeid,tb1.gameName codename,tb2.id gameTypeId,tb1.subCatId from
+        (select id,depotId,depotName,catId,gameCode,gameName,subCatId from t_gm_game where available=1 and gameCode !=''
+        union select id,depotId,depotName,catId,mbGameCode,gameName,subCatId from t_gm_game where available=1  and mbGameCode !=''
+        union select id,depotId,depotName,catId,adGameCode,gameName,subCatId from t_gm_game where available=1  and adGameCode !=''
+        union select id,depotId,depotName,catId,downGameCode,gameName,subCatId from t_gm_game where available=1  and downGameCode !=''
+        union select id,depotId,depotName,catId,embeddedCode,gameName,subCatId from t_gm_game where available=1  and embeddedCode !=''
+        union select id,depotId,depotName,catId,embeddedCode1,gameName,subCatId from t_gm_game where available=1 and embeddedCode1 !='')tb1,t_gm_cat tb2 where tb1.catId=tb2.id ) tb on rbrd.platform=tb.platform and rbrd.gametype=tb.codeid
+        <include refid="WinLost_where"/>
+        group by CONCAT(tb.depotId,tb.catId,tb.gameTypeId)
+    </select>
+    <sql id="WinLost_where">
+       <where>
+           <!--<if test=" startTime ==null and startTime =='' and endTime ==null and endTime ==''">
+               and date_format(rbrd.startday,'%Y-%c-%d') > (date_sub(now(),interval 1 day))
+           </if>-->
+           <if test=" startTime !=null and startTime !='' ">
+               and rbrd.startday <![CDATA[ >= ]]>#{startTime}
+           </if>
+           <if test=" endTime !=null and endTime !='' ">
+               and rbrd.startday <![CDATA[ <= ]]>#{endTime}
+           </if>
+          <if test=" depotId !=null and depotId !='' ">
+             and  tb.depotId=${depotId}
+           </if>
+           <if test=" catId !=null and catId !='' ">
+               and  tb.catId=${catId}
+           </if>
+           <if test=" subCatId !=null and subCatId !='' ">
+               and  tb.subCatId in (${subCatId})
+           </if>
+           <if test=" tagencyId !=null and tagencyId !='' ">
+               and  ma.tagencyId=${tagencyId}
+           </if>
+           <if test=" cagencyId !=null and cagencyId !='' ">
+               and  ma.cagencyId=${cagencyId}
+           </if>
+           <if test=" accountId !=null and accountId !='' ">
+               and  ma.id=${accountId}
+           </if>
+       </where>
+    </sql>
+    <select id="getDepot"  resultType="com.eveb.saasops.modules.analysis.entity.SelectModel">
+		select a.id as `key`,a.depotName as `value` from t_gm_depot a
+        where a.available=1
+	</select>
+    <select id="getGameCat"  resultType="com.eveb.saasops.modules.analysis.entity.SelectModel">
+	  select DISTINCT c.id as `key`,c.catName as `value` from t_gm_depot d
+      inner JOIN t_gm_depotcat dc on d.id=dc.depotId
+      inner JOIN t_gm_cat c on dc.catId=c.id
+      <where>
+          <if test="_parameter !=null and _parameter !=''">
+             and d.id=#{depotId}
+          </if>
+          and c.parentId=0
+      </where>
+	</select>
+    <select id="getSubGameCat"  resultType="com.eveb.saasops.modules.analysis.entity.SelectModel">
+	select DISTINCT c.id as `key`,c.catName as `value` from t_gm_depot d
+    inner JOIN t_gm_depotcat dc on d.id=dc.depotId
+    inner JOIN t_gm_cat c on dc.catId=c.id
+        <where>
+            <if test="depotId !=null and depotId!=''">
+                and d.id=#{depotId}
+            </if>
+            <if test="catId !=null and catId!=''">
+                and c.parentId=#{catId}
+            </if>
+            <if test="catId ==null or catId ==''">
+                and c.parentId in (select id from t_gm_cat where parentId=0)
+            </if>
+        </where>
+	</select>
+    <select id="getValidBetAccountCounts"  resultType="java.lang.Integer">
+        select count(DISTINCT rbrd.username) from rpt_bet_rcd_day rbrd
+        inner join mbr_account ma on rbrd.username=ma.loginName
+        inner join agy_account aa on ma.cagencyId=aa.id
+        inner join (select tb1.depotName platform,tb1.depotId,tb2.catName,tb2.id catId,tb1.gameCode codeid,tb1.gameName codename,tb2.id gameTypeId,tb1.subCatId from
+        (select id,depotId,depotName,catId,gameCode,gameName,subCatId from t_gm_game where available=1 and gameCode !=''
+        union select id,depotId,depotName,catId,mbGameCode,gameName,subCatId from t_gm_game where available=1  and mbGameCode !=''
+        union select id,depotId,depotName,catId,adGameCode,gameName,subCatId from t_gm_game where available=1  and adGameCode !=''
+        union select id,depotId,depotName,catId,downGameCode,gameName,subCatId from t_gm_game where available=1  and downGameCode !=''
+        union select id,depotId,depotName,catId,embeddedCode,gameName,subCatId from t_gm_game where available=1  and embeddedCode !=''
+        union select id,depotId,depotName,catId,embeddedCode1,gameName,subCatId from t_gm_game where available=1 and embeddedCode1 !='')tb1,t_gm_cat tb2 where tb1.catId=tb2.id ) tb on rbrd.platform=tb.platform and rbrd.gametype=tb.codeid
+        <include refid="WinLost_where"/>
+	</select>
+    <select id="getDepotName"  resultType="java.lang.String">
+        select tgd.depotName from t_gm_depot tgd where tgd.id=#{depotId}
+    </select>
+    <select id="getCatName"  resultType="java.lang.String">
+        select tgd.catName from t_gm_cat tgc where tgd.id=#{catId}
+    </select>
+    <select id="getGameCatName"  resultType="java.lang.String">
+        select tgc.catName from
+        (select id,depotId,depotName,catId,gameCode,gameName,subCatId from t_gm_game where available=1 and gameCode !=''
+        union select id,depotId,depotName,catId,mbGameCode,gameName,subCatId from t_gm_game where available=1  and mbGameCode !=''
+        union select id,depotId,depotName,catId,adGameCode,gameName,subCatId from t_gm_game where available=1  and adGameCode !=''
+        union select id,depotId,depotName,catId,downGameCode,gameName,subCatId from t_gm_game where available=1  and downGameCode !=''
+        union select id,depotId,depotName,catId,embeddedCode,gameName,subCatId from t_gm_game where available=1  and embeddedCode !=''
+        union select id,depotId,depotName,catId,embeddedCode1,gameName,subCatId from t_gm_game where available=1 and embeddedCode1 !='') tb1
+        inner JOIN t_gm_cat tgc on tb1.catId=tgc.id
+        where tb1.depotName=#{depotCode} and tb1.gameCode=#{gameCode} LIMIT 1;
+    </select>
+    <select id="getGameCodeByCat"  resultType="com.eveb.saasops.modules.operate.entity.TGmGame">
+        select * from t_gm_game tgg
+        <where>
+            <if test="depotName !=null and depotName!=''">
+                and tgg.depotName=#{depotName}
+            </if>
+            <if test="catId !=null and catId!=''">
+                and tgg.catId=#{catId}
+            </if>
+            <if test="subCatId !=null and subCatId!=''">
+                and tgg.subCatId=#{subCatId}
+            </if>
+        </where>
+    </select>
+
+    <select id="getDepotNameToDepotCode"  resultType="java.lang.String">
+        select tgd.depotCode from t_gm_depot tgd where tgd.depotName=#{depotName}
+    </select>
+
+    <select id="getDepotCodeToDepotName" resultType="java.lang.String">
+        select tgd.depotName from t_gm_depot tgd where tgd.depotCode=#{depotCode}
+    </select>
+    <select id="getGameTypeByDepotNameAndGameCode"  resultType="java.lang.String">
+        select tgc.catName from t_gm_cat tgc
+        inner join 	(select id,depotId,depotName,catId,gameCode,gameName,subCatId from t_gm_game where available=1 and gameCode !=''
+        union select id,depotId,depotName,catId,mbGameCode,gameName,subCatId from t_gm_game where available=1  and mbGameCode !=''
+        union select id,depotId,depotName,catId,adGameCode,gameName,subCatId from t_gm_game where available=1  and adGameCode !=''
+        union select id,depotId,depotName,catId,downGameCode,gameName,subCatId from t_gm_game where available=1  and downGameCode !=''
+        union select id,depotId,depotName,catId,embeddedCode,gameName,subCatId from t_gm_game where available=1  and embeddedCode !=''
+        union select id,depotId,depotName,catId,embeddedCode1,gameName,subCatId from t_gm_game where available=1 and embeddedCode1 !='')tb on tgc.id=tb.catId
+        where tb.depotName=#{platform} and tb.gameCode=#{gameType}
+    </select>
+</mapper>

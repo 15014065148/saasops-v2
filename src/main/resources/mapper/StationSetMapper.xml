@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="com.eveb.saasops.modules.system.systemsetting.dao.StationSetMapper">
+	<select id="queryConfigDaysAndScope" resultType="com.eveb.saasops.modules.system.systemsetting.dto.StationSet">
+		select t.sysValue as memberQueryDays,
+			   DATE_FORMAT(NOW(), '%Y-%m-%d') as createTimeTo,
+		       DATE_FORMAT(date_sub(NOW(), interval t.sysValue-1 day), '%Y-%m-%d') as createTimeFrom 
+		  from set_basic_set_sys_setting t where t.sysKey='memberQueryDays'
+	</select>
+</mapper>
