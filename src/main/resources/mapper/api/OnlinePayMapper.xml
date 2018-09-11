@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="com.eveb.saasops.modules.system.onlinepay.mapper.OnlinePayMapper">
+
+    <select id="findPaymentInfo" resultType="com.eveb.saasops.api.modules.pay.pzpay.dto.OnlinePayDto">
+    	SELECT  p.id as id,
+    		    p.name as name,
+			    p.code as code,
+				p.paymentId as paymentId,
+				p.merNo as merNo,
+				p.isEnable as isEnable,
+				p.createUser as createUser,
+				p.createTime as createTime,
+				p.modifyUser as modifyUser,
+				p.modifyTime as modifyTime,
+				p.description as description,
+				p.password as password,
+				p.sort as sort,
+				p.minLimit as minLimit,
+				p.maxLimit as maxLimit,
+				p.maxLimitDaily as maxLimitDaily,
+				p.mbrGroupType as mbrGroupType,
+				p.domainId as domainId,
+				t.urlMethod as urlMethod,
+				t.payCode as payCode 
+			FROM set_bacic_onlinePay p left join t_op_pay t on p.paymentId=t.id 
+			 WHERE p.id = #{id} limit 0,1
+	</select>
+
+</mapper>

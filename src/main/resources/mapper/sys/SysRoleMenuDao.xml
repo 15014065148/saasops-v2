@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.eveb.saasops.modules.sys.dao.SysRoleMenuDao">
+
+	<insert id="save">
+		insert into sys_role_menu
+		(
+			`role_id`, 
+			`menu_id`
+		)
+		values
+		<foreach collection="menuIdList" item="item" index="index" separator="," >
+		(
+			#{roleId}, 
+			#{item} 
+		)
+		</foreach>
+	</insert>
+	
+	<delete id="delete">
+		delete from sys_role_menu where role_id = #{value}
+	</delete>
+	
+	<select id="queryMenuIdList" resultType="long">
+		select menu_id from sys_role_menu where role_id = #{value}
+	</select>
+	
+	<select id="queryMenuList" resultType="com.eveb.saasops.modules.sys.entity.SysRoleMenuEntity" >
+		select srm.* from sys_role_menu srm inner join sys_menu sm on sm.menu_id = srm.menu_id and sm.type in (0, 1) where srm.role_id = #{roleId}
+	</select>
+
+	<select id="queryMenuAuthList" resultType="com.eveb.saasops.modules.sys.entity.SysRoleMenuEntity" >
+		select srm.* from sys_role_menu srm inner join sys_menu sm on sm.menu_id = srm.menu_id and sm.type not in(4, 5) where srm.role_id = #{roleId}
+	</select>
+
+	<insert id="saveBatch" parameterType="com.eveb.saasops.modules.sys.entity.SysRoleMenuEntity">
+		insert into sys_role_menu (role_id, menu_id , isTotalChecked)
+		values
+		<foreach collection="list" item="item" index="index" separator="," >
+			(
+			#{item.roleId},#{item.menuId},#{item.isTotalChecked}
+			)
+		</foreach>
+	</insert>
+
+	<select id="findSysRoleMenuByRoleIdAndMenuId" resultType="java.lang.Integer">
+		SELECT count(*) FROM sys_role_menu WHERE role_id=#{roleId} AND menu_id=#{menuId}
+	</select>
+</mapper>

@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="com.eveb.saasops.modules.system.mapper.SetBasicSysMapper">
+    <select id="querySetBasicSysdeposit"
+            resultType="com.eveb.saasops.modules.system.cmpydeposit.entity.SysDeposit">
+        select t1.id,t1.`code`,t1.`status`,t1.bankType,t1.bankAccount,t1.realName,t1.depositType,case when t1.bankType=0
+        then
+        t1.bankName else t1.depositType end
+        bankName,t1.bankBranch,t1.feeTop,t1.feeScale,t1.feeFixed,t1.feeWay,t1.dayMaxAmt,t1.sortId,t1.createUser,
+        t1.createTime,t1.modifyUser,t1.modifyTime,t2.memGroId mbrGrpId,t3.bankLog,t4.lowQuota,t4.topQuota from
+        set_basic_sys_deposit t1 left join set_basic_sys_dep_mbr t2 on
+        t1.id=t2.depositId left join t_bs_bank t3 on (t1.bankType=0 and t1.bankName=t3.bankName) or (t1.bankType=1 and
+        t1.depositType=t3.bankName)
+        left join mbr_deposit_cond t4 on t4.groupId=t2.memGroId where t2.memGroId=#{groupId} and t1.`status`=1
+        and dayMaxAmt<![CDATA[>=]]>(select IFNULL(sum(actualArrival),0) from fund_deposit where companyPayId=t1.id and
+        `status`=1)
+        order by bankType,t1.sortId
+    </select>
+    <select id="setBasicSysdepositOne"
+            resultType="com.eveb.saasops.modules.system.cmpydeposit.entity.SysDeposit">
+        select t1.*,t2.memGroId mbrGrpId from
+        set_basic_sys_deposit t1 left join set_basic_sys_dep_mbr t2 on
+        t1.id=t2.depositId and `status`=1 where t1.id=#{id} and t2.memGroId=#{groupId}
+    </select>
+
+    <select id="querydepositAmount"
+            resultType="com.eveb.saasops.modules.system.cmpydeposit.entity.SysDeposit">
+        (SELECT
+        t1.*,(SELECT
+        sum(depositAmount) FROM fund_deposit fd where companyPayId=t1.id and fd.`status` = 1 and fd.mark = 1)
+        depositAmount,t2.memGroId mbrGrpId,t3.bankLog
+        FROM set_basic_sys_deposit t1 left join set_basic_sys_dep_mbr t2 on
+        t1.id=t2.depositId left join t_bs_bank t3 on (t1.bankType=0 and t1.bankName=t3.bankName) or (t1.bankType=1 and
+        t1.depositType=t3.bankName)
+        WHERE bankType=0 and t1.devSource LIKE CONCAT('%',#{devSource}, '%') and t1.status=1
+        GROUP BY bankAccount ORDER BY depositAmount,t1.sortid)
+        UNION ALL
+        (SELECT t1.*,(SELECT
+        sum(depositAmount) FROM fund_deposit fd where companyPayId=t1.id and fd.`status` = 1 and fd.mark = 1)
+        depositAmount,t2.memGroId mbrGrpId,t3.bankLog
+        FROM set_basic_sys_deposit t1 left join set_basic_sys_dep_mbr t2 on
+        t1.id=t2.depositId left join t_bs_bank t3 on (t1.bankType=0 and t1.bankName=t3.bankName) or (t1.bankType=1 and
+        t1.depositType=t3.bankName)
+        WHERE bankType=1 and t1.devSource LIKE CONCAT('%',#{devSource}, '%') and t1.status=1
+        GROUP BY bankAccount ORDER BY depositAmount,t1.sortid)
+    </select>
+
+    <insert id="insertSysSetting" parameterType="com.eveb.saasops.modules.system.systemsetting.entity.SysSetting">
+        INSERT INTO set_basic_set_sys_setting (sysKey, sysValue) VALUES (#{syskey}, #{sysvalue});
+    </insert>
+
+</mapper>

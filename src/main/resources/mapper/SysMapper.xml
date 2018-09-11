@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="com.eveb.saasops.modules.system.sysconfig.dao.SysMapper">
+
+    <select id="selectProxys" resultType="java.lang.String">
+        select `values` from s_sys_config
+        <where>
+            <if test="groups != null and groups != ''">
+                AND groups=#{groups}
+            </if>
+            <if test="keys != null and keys != ''">
+                AND `keys` =#{keys}
+            </if>
+        </where>
+    </select>
+</mapper>
